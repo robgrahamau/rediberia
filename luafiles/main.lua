@@ -1,5 +1,5 @@
-version = "2.2.2"
-lastupdate = "8-JAN-2020 1610AUEDST"
+version = "2.2.3"
+lastupdate = "10-JAN-2020 1610AUEDST"
 
 env.info("----------------------------------------------------------")
 env.info("--------------RED IBERIA VERSION ".. version .."----------------------")
@@ -761,6 +761,8 @@ do
     self.insurgent1m = nil
     self.rsead = nil
     self.rattack = nil
+    self.bsead= nil
+    self.battack = nil
     self.r99 = nil
     self.bapache = nil
     self.insurgent1t = nil
@@ -1863,6 +1865,28 @@ do
  end
  
  function RIB:Gunships()
+ local randomchance = math.random(1,100)
+  BASE:E({self.name,"sead",randomchance})
+  if randomchance > 85 then
+    if self.bsead == nil then
+      BASE:E({self.name,"Blue Sead was nil spawning them in"})
+      self.bsead = SPAWN:New("Viper11"):InitRepeatOnLanding():InitCleanUp(120):Spawn()
+    else
+      if self.bsead:IsAlive() ~= true or self.bsead:AllOnGround() == true then
+        self.bsead:Destroy()
+        self.bsead = SPAWN:New("Viper11"):InitRepeatOnLanding():InitCleanUp(120):Spawn()
+      end
+    end
+    if self.battack == nil then
+      BASE:E({self.name,"Blue Attack was nil spawning them in"})
+      self.battack = SPAWN:New("PIG11"):InitRepeatOnLanding():InitCleanUp(120):Spawn()
+    else
+      if self.battack:IsAlive()~= true or self.battack:AllOnGround() == true then
+        self.battack:Destroy()
+        self.battack = SPAWN:New("PIG11"):InitRepeatOnLanding():InitCleanUp(120):Spawn()
+      end
+    end
+  end
   local rrand = math.random(1,100)
   if rrand > 50 then
     if self.russianhelos == nil then
@@ -2012,7 +2036,7 @@ do
 function RIB:RAttackers()
 local randomchance = math.random(1,100)
 BASE:E({self.name,"sead",randomchance})
-  if randomchance > 80 then
+  if randomchance > 85 then
     if self.rsead ~= nil then
       if self.rsead:IsAlive() ~= true or self.rsead:AllOnGround() == true then
         self.rsead = SPAWN:NewWithAlias("Sqn119-SEAD","Sqn199-SEAD"):InitRandomizeRoute(1,4,2000,1500):Spawn()  
