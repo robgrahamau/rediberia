@@ -41,7 +41,7 @@ local savefile = lfs.writedir() .."rib\\" .. savefilename
  -----------------------------------
  --Do not edit below here
  -----------------------------------
- local version = "1.0"
+ local version = "1.1"
  
  function IntegratedbasicSerialize(s)
     if s == nil then

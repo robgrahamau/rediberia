@@ -141,87 +141,143 @@ else
 end
 
 
-function savenewpersistence(ourthread)
+function savenewpersistence(RedSukSpawned,RedGudSpawned,RedSenSpawned,RedKutSpawned,RedArmySpawned,RedArmy1Spawned,BlueSukSpawned,BlueGudSpawned,BlueSenSpawned,BlueKutSpawned,BlueKobSpawned,BlueArmySpawned,BlueArmy1Spawned,BlueArmy2Spawned)
   BASE:E({"RUNNING PERSISTENCE FOR MAINMISSION"})
-  BASE:E({"DUMPING OURTHREAD",ourthread})
-  if ourthread.RedSukSpawned == 0 then
+  BASE:E({"Dumpiung Blue GudSpawned",BlueGudSpawned})
+  if RedSukSpawned == 0 then
       mainmission.RedSukSpawned = 0 
   else
-      mainmission.RedSukSpawned = ourthread.RedSukSpawned:GetName()
+    if RedSukspawned:IsAlive() == true then
+      mainmission.RedSukSpawned = RedSukSpawned:GetName()
+    else
+      mainmission.RedSukSpawned = 0
+    end
   end
-  if ourthread.RedGudSpawned == 0 then
+  if RedGudSpawned == 0 then
     mainmission.RedGudSpawned = 0
   else
-    mainmission.RedGudSpawned = ourthread.RedGudSpawned:GetName()
+    if RedGudSpawned:IsAlive() == true then
+      mainmission.RedGudSpawned = RedGudSpawned:GetName()
+    else
+      mainmission.RedGudSpawned = 0
+    end
   end
-  if ourthread.RedSenSpawned == 0 then
+  if RedSenSpawned == 0 then
     mainmission.RedSenSpawned = 0
   else
-    mainmission.RedSenSpawned = ourthread.RedSenSpawned:GetName()
+    if RedSenSpawned:IsAlive() == true then
+      mainmission.RedSenSpawned = RedSenSpawned:GetName()
+    else
+      mainmission.RedGudSpawned = 0
+    end
   end
-  if ourthread.RedKutSpawned == 0 then
+  if RedKutSpawned == 0 then
     mainmission.RedKutSpawned = 0
   else
-    mainmission.RedKutSpawned = ourthread.RedKutSpawned:GetName()
+    if RedKutSpawned:IsAlive() == true then
+      mainmission.RedKutSpawned = RedKutSpawned:GetName()
+    else
+      mainmission.RedKutSpawned = 0
+    end
   end
-  if ourthread.RedArmySpawned == 0 then
+  if RedArmySpawned == 0 then
     mainmission.RedArmySpawned = 0
   else
-    mainmission.RedArmySpawned = ourthread.RedArmySpawned:GetName()
+    if RedArmySpawned:IsAlive() == true then
+      mainmission.RedArmySpawned = RedArmySpawned:GetName()
+    else
+      mainmission.RedArmySpawned = 0
+    end
   end
-  if ourthread.RedArmy1Spawned == 0 then
+  if RedArmy1Spawned == 0 then
     mainmission.RedArmy1Spawned = 0 
   else
-    mainmission.RedArmy1Spawned = ourthread.RedArmy1Spawned:GetName()
+    if RedArmy1Spawned:IsAlive() == true then
+      mainmission.RedArmy1Spawned = RedArmy1Spawned:GetName()
+    else
+      mainmission.RedArmy1Spawned = 0
+    end
   end
-  if ourthread.BlueSukSpawned == 0 then
+  if BlueSukSpawned == 0 then
     mainmission.BlueSukSpawned = 0
   else
-    mainmission.BlueSukSpawned = ourthread.BlueSukSpawned:GetName()
+    if BlueSukSpawned:IsAlive() == true then
+      mainmission.BlueSukSpawned = BlueSukSpawned:GetName()
+    else
+      mainmission.BlueSukSpawned = 0
+    end
   end
-  if ourthread.BlueGudSpawned == 0 then
+  if BlueGudSpawned == 0 then
     mainmission.BlueGudSpawned = 0
   else
-    mainmission.BlueGudSpawned = ourthread.BlueGudSpawned:GetName()
+    if BlueGudSpawned:IsAlive() == true then
+      mainmission.BlueGudSpawned = BlueGudSpawned:GetName()
+    else
+      mainmission.BlueGudSpawned = 0
+    end
   end
-  if ourthread.BlueSenSpawned == 0 then
+  if BlueSenSpawned == 0 then
     mainmission.BlueSenSpawned = 0
   else
-    mainmission.BlueSenSpawned = ourthread.BlueSenSpawned:GetName()
+    if BlueSenSpawned:IsAlive() == true then
+      mainmission.BlueSenSpawned = BlueSenSpawned:GetName()
+    else
+      mainmission.BlueSenSpawned = 0
+    end
   end
-  if ourthread.BlueKutSpawned == 0 then
+  if BlueKutSpawned == 0 then
     mainmission.BlueKutSpawned = 0
   else
-    mainmission.BlueKutSpawned = ourthread.BlueKutSpawned:GetName()
+    if BlueKutSpawned:IsAlive() == true then
+      mainmission.BlueKutSpawned = BlueKutSpawned:GetName()
+    else
+      mainmission.BlueKutSpawned = 0
+    end
   end
-  if ourthread.BlueKobSpawned == 0 then
+  if BlueKobSpawned == 0 then
     mainmission.BlueKobSpawned = 0 
   else 
-    mainmission.BlueKobSpawned = ourthread.BlueKobSpawned:GetName()
+    if BlueKobSpawned:IsAlive() == true then
+      mainmission.BlueKobSpawned = BlueKobSpawned:GetName()
+    else
+      mainmission.BlueKobSpawned = 0
+    end
   end
-  if ourthread.BlueArmySpawned == 0 then
+  if BlueArmySpawned == 0 then
     mainmission.BlueArmySpawned = 0
   else
-    mainmission.BlueArmySpawned = ourthread.BlueArmySpawned:GetName()
+    if BlueArmySpawned:IsAlive() == true then
+      mainmission.BlueArmySpawned = BlueArmySpawned:GetName()
+    else
+      mainmission.BlueArmySpawned = 0
+    end
   end
-  if ourthread.BlueArmy1Spawned == 0 then
+  if BlueArmy1Spawned == 0 then
     mainmission.BlueArmy1Spawned = 0
   else
-    mainmission.BlueArmy1Spawned = ourthread.BlueArmy1Spawned:GetName()
+    if BlueArmy1Spawned:IsAlive() == true then
+      mainmission.BlueArmy1Spawned = BlueArmy1Spawned:GetName()
+    else
+      mainmission.BlueArmy1Spawned = 0
+    end
   end
-  if ourthread.BlueArmy2Spawned == 0 then
+  if BlueArmy2Spawned == 0 then
     mainmission.BlueArmy2Spawned = 0
   else
-    mainmission.BlueArmy2Spawned = ourthread.BlueArmy2Spawned:GetName()
+    if BlueArmy2Spawned:IsAlive() == true then
+      mainmission.BlueArmy2Spawned = BlueArmy2Spawned:GetName()
+    else
+      mainmission.BlueArmy2Spawned = 0
+    end
   end
   BASE:E({"DONE RUNNING PERSISTENCE FOR MAINMISSION"})
   BASE:E({"Our Thread table is",ourthread})
   BASE:E({"MAINMISSION TABLE IS",mainmission})
 end
 
-function savenewpersistencenow(ourthread)
+function savenewpersistencenow(RedSukSpawned,RedGudSpawned,RedSenSpawned,RedKutSpawned,RedArmySpawned,RedArmy1Spawned,BlueSukSpawned,BlueGudSpawned,BlueSenSpawned,BlueKutSpawned,BlueKobSpawned,BlueArmySpawned,BlueArmy1Spawned,BlueArmy2Spawned)
   env.info("FORCE DATA Data SAVE!!!!!!!!!!.")
-  savenewpersistence(ourthread)
+  savenewpersistence(RedSukSpawned,RedGudSpawned,RedSenSpawned,RedKutSpawned,RedArmySpawned,RedArmy1Spawned,BlueSukSpawned,BlueGudSpawned,BlueSenSpawned,BlueKutSpawned,BlueKobSpawned,BlueArmySpawned,BlueArmy1Spawned,BlueArmy2Spawned)
   newMissionStr = IntegratedserializeWithCycles("mainmission",mainmission) --save the Table as a serialised type with key SaveUnits
   writemission(newMissionStr, savefile)--write the file from the above to SaveUnits.lua
   env.info("Data saved.")
@@ -229,7 +285,7 @@ end
 --THE SAVING SCHEDULE
 SCHEDULER:New( nil, function()
 if init == true then
-  savenewpersistence(mainthread)
+  savenewpersistence(mainthread.RedSukSpawned,mainthread.RedGudSpawned,mainthread.RedSenSpawned,mainthread.RedKutSpawned,mainthread.RedArmySpawned,mainthread.RedArmy1Spawned,mainthread.BlueSukSpawned,mainthread.BlueGudSpawned,mainthread.BlueSenSpawned,mainthread.BlueKutSpawned,mainthread.BlueKobSpawned,mainthread.BlueArmySpawned,mainthread.BlueArmy1Spawned,mainthread.BlueArmy2Spawned)
   newMissionStr = IntegratedserializeWithCycles("mainmission",mainmission) --save the Table as a serialised type with key SaveUnits
   writemission(newMissionStr, savefile)--write the file from the above to SaveUnits.lua
   env.info("Data saved.")

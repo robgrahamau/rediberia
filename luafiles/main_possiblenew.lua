@@ -1061,6 +1061,7 @@ do
             KOBOWNER = 1
             BASE:E({"Red has taken Kobuleti! Spawning Defences oh that's right they don't get any!"})
             kobbluedisallow()
+            self.BlueKobSpawned = 0 
             if self.kobsqn ~= nil then
               self.kobsqn:SpawnScheduleStop()
             else
@@ -1080,6 +1081,7 @@ do
               self.BlueSenSpawned:Destroy()
             end
             self.BlueSenSpawned = self.BlueSenSpawn:Spawn()
+            self.RedSenSpawned = 0
             allowbluesen()
             if self.sensqn ~= nil then
               self.sensqn:SpawnScheduleStart()
@@ -1096,7 +1098,8 @@ do
             if self.RedSenSpawned ~= 0 then
               self.RedSenSpawned:Destroy()
             end
-            self.RedSenSpawned = self.RedSenSpawn:Spawn() 
+            self.RedSenSpawned = self.RedSenSpawn:Spawn()
+            self.BlueSenSpawned = 0 
             disallowbluesen()
             if self.sensqn ~= nil then
               self.sensqn:SpawnScheduleStop()
@@ -1118,6 +1121,7 @@ do
               self.BlueKutSpawned:Destory()
             end
             self.BlueKutSpawned = self.BlueKutSpawn:Spawn()
+            self.RedKutSpawned = 0
             allowbluekut()
             if self.kutsqn ~= nil then
               self.kutsqn:SpawnScheduleStart()
@@ -1136,6 +1140,7 @@ do
             end
             self.RedKutSpawned = self.RedKutSpawn:Spawn()
             disallowbluekut()
+            self.BlueKutSpawned = 0
             if self.kutsqn ~= nil then
               self.kutsqn:SpawnScheduleStop()
             else
@@ -1156,6 +1161,7 @@ do
               self.BlueSukSpawened:Destroy()
             end
             self.BlueSukSpawned = self.BlueSukDefSpawn:Spawn()
+            self.RedSukSpawned = 0
             allowbluesuk()
             disallowredsuk()
          else
@@ -1168,6 +1174,7 @@ do
             if self.RedSukSpawned ~= 0 then
               self.RedSukSpawned:Destroy()
             end
+            self.BlueSukSpawned = 0
             self.RedSukSpawned = self.RedSukDefSpawn:Spawn()
             disallowbluesuk()
             allowredsuk()
@@ -1181,8 +1188,10 @@ do
             GUDOWNER = 2
             BASE:E({self.name,"Blue Spawning Guduata Defences"})
             self.BlueGudSpawned = self.BluGudDefSpawn:Spawn()
+            self.RedGudSpawned = 0
             allowbluegud()
             disallowredgud()
+
           else
             BASE:E({self.name,"Base change but blue already owns it"})
           end
@@ -1191,6 +1200,7 @@ do
             GUDOWNER = 1
             BASE:E({self.name,"Red Spawning Guduata Defences"})
             self.RedGudSpawned = self.RedGudDefSpawn:Spawn()
+            self.BlueGudSpawned = 0
             disallowbluegud()
             allowredgud()
           else
@@ -1203,7 +1213,7 @@ do
       self:E({"Updating Persistence"})
       savePersistenceEngine()
       self:E({"Should be Updating main Persistence"})
-      savenewpersistencenow(self.RedSukSpawned,self.RedGudSpawned,self.RedSenSpawned,self.RedKutSpawned,self.RedArmySpawned,self.RedArmy1Spawned,self.BlueSukSpawned,self.BlueGudSpawned,self.BlueSenSpawned,self.BlueKutSpawned,self.BlueKobSpawned,self.BlueArmySpawned,self.BlueArmy1Spawned,self.BlueArmy2Spawned)
+      savenewpersistencenow(self)
     else
       self:E({"RIB WARNING NOT INITALISED CAPTURE",AirbaseName,coalition})
     end  
@@ -2234,12 +2244,10 @@ function RIB:RInsurgents()
     BASE:E({self.name,"Spawning Blue Kobeleti Defenses"})
     if mainmission.BlueKobSpawned ~= 0 then
       BASE:E({self.name,"Main mission blue kobspawned was not nil trying to find group.",mainmission.BlueKobSpawned})
-      if GROUP:FindByName(mainmission.BlueKobSpawned) ~= nil then
-        self.BlueKobSpawned = GROUP:FindByName(mainmission.BlueKobSpawned)
-      else
-        BASE:E({self.name,"Main mission blue kobspawned was nil spawning in new unit"})
-        self.BlueKobSpawned = 0
-      end
+      self.BlueKobSpawned = GROUP:FindByName(mainmission.BlueKobSpawned)
+    else
+      BASE:E({self.name,"Main mission blue kobspawned was nil spawning in new unit"})
+      self.BlueKobSpawned = self.BlueKobSpawn:Spawn()
     end
     allowbluekob()
   else
@@ -2260,12 +2268,10 @@ function RIB:RInsurgents()
     BASE:E({self.name,"Spawning Blue Sen Defenses, opening blue slots"})
     if mainmission.BlueSenSpawned ~= 0 then
       BASE:E({self.name,"Main mission blue Sen spawned was not nil trying to find.",mainmission.BlueKobSpawned})
-      if GROUP:FindByName(mainmission.BlueKobSpawned) ~= nil then
-        self.BlueSenSpawned = GROUP:FindByName(mainmission.BlueKobSpawned)
-      else
-        BASE:E({self.name,"Main mission blue Sen spawned was nil spawning in new unit"})
-        self.BlueSenSpawned = 0
-      end
+      self.BlueSenSpawned = GROUP:FindByName(mainmission.BlueKobSpawned)
+    else
+      BASE:E({self.name,"Main mission blue Sen spawned was nil spawning in new unit"})
+      self.BlueSenSpawned = self.BlueSenSpawn:Spawn()
     end
     allowbluesen()
   else
@@ -2273,12 +2279,10 @@ function RIB:RInsurgents()
     BASE:E({self.name,"Spawning RAFD Sen Defenses, closing blue slots"})
     if mainmission.RedSenSpawned ~= 0 then
       BASE:E({self.name,"Main mission Red Sen spawned was not nil trying to find.",RedSenSpawned})
-      if GROUP:FindByName(mainmission.RedSenSpawned) ~= nil then
-        self.RedSenSpawned = GROUP:FindByName(mainmission.RedSenSpawned)
-      else
-        BASE:E({self.name,"Main mission Red Sen spawned was nil spawning in new unit"})
-        self.RedSenSpawned = 0
-      end
+      self.RedSenSpawned = GROUP:FindByName(mainmission.RedSenSpawned)
+    else
+      BASE:E({self.name,"Main mission Red Sen spawned was nil spawning in new unit"})
+      self.RedSenSpawned = self.RedSenSpawn:Spawn()
     end
      disallowbluesen()
     if self.sensqn ~= nil then
@@ -2292,47 +2296,39 @@ function RIB:RInsurgents()
     BASE:E({self.name,"Spawning Blue KUT Defenses, opening blue slots"})
     if mainmission.BlueKutSpawned ~= 0 then
       BASE:E({self.name,"Main mission blue kutspawned was not nil trying to find.",mainmission.BlueKutSpawned})
-      if GROUP:FindByName(mainmission.BlueKutSpawned) ~= nil then
-        self.BlueKutSpawned = GROUP:FindByName(mainmission.BlueKutSpawned)
-      else
-        BASE:E({self.name,"Main mission blue Kutspawned was nil so = 0"})
-        self.BlueKutSpawned = 0
-      end
+      self.BlueKutSpawned = GROUP:FindByName(mainmission.BlueKutSpawned)
+    else
+      BASE:E({self.name,"Main mission blue Kutspawned was nil spawning in new unit"})
+      self.BlueKutSpawned = self.BlueKutSpawn:Spawn()
     end
          MESSAGE:New("INIT KUT OWNED BY BLUE",30):ToAll()
             allowbluekut()
     else
-     KUTOWNER = 1
-     MESSAGE:New("INIT KUT OWNED BY RED",30):ToAll()
-     BASE:E({self.name,"Spawning RAFD Kut Defenses, opening blue slots"})
-     if mainmission.RedKutSpawned ~= 0 then
-       BASE:E({self.name,"Main mission Red kutspawned was not nil trying to find.",mainmission.BlueKutSpawned})
-       if GROUP:FindByName(mainmission.RedKutSpawned) ~= nil then
-          self.RedKutSpawned = GROUP:FindByName(mainmission.RedKutSpawned)
-       else
-          BASE:E({self.name,"Main mission Red kutspawned was nil setting to 0"})
-          self.RedKutSpawned = 0
-       end
-     end
-     disallowbluekut()
-     if self.kutsqn ~= nil then
-      self.kutsqn:SpawnScheduleStop()
-     else
-      BASE:E({self.name,"Kutsqn was nil this shoulnd't happen"})
+            KUTOWNER = 1
+            MESSAGE:New("INIT KUT OWNED BY RED",30):ToAll()
+            BASE:E({self.name,"Spawning RAFD Kut Defenses, opening blue slots"})
+            if mainmission.RedKutSpawned ~= 0 then
+              BASE:E({self.name,"Main mission Red kutspawned was not nil trying to find.",mainmission.BlueKutSpawned})
+              self.RedKutSpawned = GROUP:FindByName(mainmission.RedKutSpawned)
+            else
+              BASE:E({self.name,"Main mission Red kutspawned was nil spawning in new unit"})
+              self.RedKutSpawned = self.RedKutSpawn:Spawn()
+            end
+            disallowbluekut()
+            if self.kutsqn ~= nil then
+              self.kutsqn:SpawnScheduleStop()
+            else
+              BASE:E({self.name,"Kutsqn was nil this shoulnd't happen"})
+            end
       end
-  end
   if (PersistedStore.sukhumi == 1) or (PersistedStore.sukhumi == 0) then
     BASE:E({self.name,"Red Spawning Sukhumi Defenses."})
     if mainmission.RedSukSpawned ~= 0 then
       BASE:E({self.name,"Main mission Red Sukspawned was not nil trying to find.",mainmission.RedSukSpawned})
-      if GROUP:FindByName(mainmission.RedSukSpawned) ~= nil then
-        self.RedSukSpawned = GROUP:FindByName(mainmission.RedSukSpawned)
-      else
-        BASE:E({self.name,"RedSukSpawned Find BY name on group == nil setting to 0"})
-        self.RedSukSpawned = 0
-      end
+      self.RedSukSpawned = GROUP:FindByName(mainmission.RedSukSpawned)
     else
-      self.RedSukSpawned = 0
+      BASE:E({self.name,"Main mission blue kobspawned was nil spawning in new unit"})
+      self.RedSukSpawned = self.RedSukDefSpawn:Spawn()
     end
     SUKOWNER = 1
     MESSAGE:New("INIT SUK OWNED BY RED",30):ToAll() 
@@ -2345,14 +2341,10 @@ function RIB:RInsurgents()
          MESSAGE:New("INIT Suk OWNED BY Blue",30):ToAll()
     if mainmission.BlueSukSpawned ~= 0 then
       BASE:E({self.name,"Main mission Blue Sukspawned was not nil trying to find.",mainmission.BlueSukSpawned})
-      if GROUP:FindByName(mainmission.BlueSukSpawned) ~= nil then
-        self.BlueSukSpawned = GROUP:FindByName(mainmission.BlueSukSpawned)
-      else
-        BASE:E({self.name,"BlueSukSpawned returned nil setting to 0"})
-        self.BlueSukSpawned = 0
-      end
+      self.BlueSukSpawned = GROUP:FindByName(mainmission.BlueSukSpawned)
     else
-        self.BlueSukSpawned = 0
+      BASE:E({self.name,"Main mission blue kobspawned was nil spawning in new unit"})
+      self.BlueSukSpawned = self.BlueSukDefSpawn:Spawn()
     end
          allowbluesuk()
          disallowredsuk()
@@ -2365,13 +2357,10 @@ function RIB:RInsurgents()
      BASE:E({self.name,"Red Spawning Guduata Defences"})
     if mainmission.RedGudSpawned ~= 0 then
       BASE:E({self.name,"Main mission Red Gudspawned was not nil trying to find.",mainmission.RedGudSpawned})
-      if GROUP:FindByName(mainmisson.RedGudSpawned) ~= nil then
-        self.RedGudSpawned = GROUP:FindByName(mainmission.RedGudSpawned)
-      else
-        self.RedGudSpawned = 0
-      end
+      self.RedGudSpawned = GROUP:FindByName(mainmission.RedGudSpawned)
     else
-      self.RedGudSpawned = 0
+      BASE:E({self.name,"Main mission red Gudspawned was nil spawning in new unit"})
+      self.RedGudSpawned = self.RedGudDefSpawn:Spawn()
     end
      MESSAGE:New("INIT: GUD OWNED BY RED",30):ToAll()
      disallowbluegud()
@@ -2381,13 +2370,10 @@ function RIB:RInsurgents()
      BASE:E({self.name,"Blue Spawning Guduata Defences"})
      if mainmission.BlueGudSpawned ~= 0 then
       BASE:E({self.name,"Main mission Blue Gudspawned was not nil trying to find.",mainmission.BlueGudSpawned})
-      if GROUP:FindByName(mainmission.BlueGudSpawned) ~= nil then
-        self.BlueGudSpawned = GROUP:FindByName(mainmission.BlueGudSpawned)
-      else
-        self.BlueGudSpawned = 0
-      end
-     else
-      self.BlueGudSpawned = 0
+      self.BlueGudSpawned = GROUP:FindByName(mainmission.BlueGudSpawned)
+    else
+      BASE:E({self.name,"Main mission Blue Gudspawned was nil spawning in new unit"})
+      self.BlueGudSpawned = self.RedBlueDefSpawn:Spawn()
     end
      self.BluGudDef = self.BluGudDefSpawn:Spawn()
      MESSAGE:New("INIT GUD OWNED BY BLUE",30):ToAll()

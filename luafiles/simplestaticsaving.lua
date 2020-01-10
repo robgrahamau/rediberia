@@ -26,10 +26,10 @@
 --I experienced issues Spawning Statics and Destroying statics in some configurations, so I'm exploding them and not deleting them like SGS. 
 
   --Configurable for user:
-local SaveScheduleStatics=10 --how many seconds between each check of all the statics.
+local SaveScheduleStatics=60 --how many seconds between each check of all the statics.
 local savefilename = "staticsave.lua"
 local savefile = lfs.writedir() .."rib\\" .. savefilename
-AllStatics = SET_STATIC:New():FilterPrefixes({"Factory","Warehouse"}):FilterStart()
+AllStatics = SET_STATIC:New():FilterPrefixes({"DEPOT"}):FilterStart()
  -----------------------------------
  --Do not edit below here
  -----------------------------------
@@ -116,11 +116,14 @@ env.info("Loaded Simple Statics Saving, by Pikey, 2018, (updated Dec 2019) versi
 if file_exists(savefile) then
   env.info("Script loading existing database")
   dofile(savefile)
+  BASE:E({"Pikeys Simple static do file done",SaveStatics})
   --This version uses Destroy()
-  AllStatics:ForEach(function (stat)
-  if SaveStatics[stat:GetName()]["dead"]==true then
-    local coord = stat:GetCoordinate()
-    stat:Destroy()
+  AllStatics:ForEach(function (grp)
+  BASE:E({"for each entered",grp,grp:GetName()})
+  if SaveStatics[grp:GetName()]["dead"]==true then
+    BASE:E({"attempting to get coord for Static",grp:GetName()})
+    local coord = grp:GetCoordinate()
+    grp:Destroy()
     coord:Explosion(200) --just a little black mark
     rngsmokes(coord)
   end
