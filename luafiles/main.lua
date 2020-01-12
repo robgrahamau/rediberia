@@ -759,9 +759,7 @@ do
     --self:HandleEvent(EVENTS.Dead)
     self.insurgent1 = nil
     self.insurgent1m = nil
-    self.rsead = nil
     self.rattack = nil
-    self.bsead= nil
     self.battack = nil
     self.r99 = nil
     self.bapache = nil
@@ -1867,15 +1865,6 @@ do
  local randomchance = math.random(1,100)
   BASE:E({self.name,"sead",randomchance})
   if randomchance > 85 then
-    if self.bsead == nil then
-      BASE:E({self.name,"Blue Sead was nil spawning them in"})
-      self.bsead = SPAWN:New("Viper11"):InitRepeatOnLanding():InitCleanUp(120):Spawn()
-    else
-      if self.bsead:IsAlive() ~= true or self.bsead:AllOnGround() == true then
-        self.bsead:Destroy()
-        self.bsead = SPAWN:New("Viper11"):InitRepeatOnLanding():InitCleanUp(120):Spawn()
-      end
-    end
     if self.battack == nil then
       BASE:E({self.name,"Blue Attack was nil spawning them in"})
       self.battack = SPAWN:New("PIG11"):InitRepeatOnLanding():InitCleanUp(120):Spawn()
@@ -2036,13 +2025,6 @@ function RIB:RAttackers()
 local randomchance = math.random(1,100)
 BASE:E({self.name,"sead",randomchance})
   if randomchance > 85 then
-    if self.rsead ~= nil then
-      if self.rsead:IsAlive() ~= true or self.rsead:AllOnGround() == true then
-        self.rsead = SPAWN:NewWithAlias("Sqn119-SEAD","Sqn199-SEAD"):InitRandomizeRoute(1,4,2000,1500):Spawn()  
-      end
-    else
-      self.rsead = SPAWN:NewWithAlias("Sqn119-SEAD","Sqn199-SEAD"):InitRandomizeRoute(1,4,2000,1500):Spawn()
-    end
     if self.rattack ~= nil then
       if self.rattack:IsAlive() ~= true or self.rattack:AllOnGround() == true then
         self.rattack = SPAWN:NewWithAlias("Sqn119 BAI","Sqn119 BAI"):InitRandomizeRoute(1,4,2000,1500):Spawn()
@@ -2238,8 +2220,9 @@ function RIB:RInsurgents()
         self.BlueKobSpawned = GROUP:FindByName(mainmission.BlueKobSpawned)
       else
         BASE:E({self.name,"Main mission blue kobspawned was nil spawning in new unit"})
-        self.BlueKobSpawned = 0
       end
+    else
+      self.BlueKobSpawned = self.BlueKobSpawn:Spawn()
     end
     allowbluekob()
   else
@@ -2257,6 +2240,7 @@ function RIB:RInsurgents()
   end
   if PersistedStore.senaki == 2 or PersistedStore.senaki == 0 then
     SENOWNER = 2
+    self.RedSenSpawned = 0
     BASE:E({self.name,"Spawning Blue Sen Defenses, opening blue slots"})
     if mainmission.BlueSenSpawned ~= 0 then
       BASE:E({self.name,"Main mission blue Sen spawned was not nil trying to find.",mainmission.BlueKobSpawned})
@@ -2264,12 +2248,14 @@ function RIB:RInsurgents()
         self.BlueSenSpawned = GROUP:FindByName(mainmission.BlueKobSpawned)
       else
         BASE:E({self.name,"Main mission blue Sen spawned was nil spawning in new unit"})
-        self.BlueSenSpawned = 0
       end
+    else
+      self.BlueSenSpawned = self.BlueSenSpawn:Spawn()
     end
     allowbluesen()
   else
     SENOWNER = 1
+    self.BlueSenSpawned = 0
     BASE:E({self.name,"Spawning RAFD Sen Defenses, closing blue slots"})
     if mainmission.RedSenSpawned ~= 0 then
       BASE:E({self.name,"Main mission Red Sen spawned was not nil trying to find.",RedSenSpawned})
@@ -2277,8 +2263,9 @@ function RIB:RInsurgents()
         self.RedSenSpawned = GROUP:FindByName(mainmission.RedSenSpawned)
       else
         BASE:E({self.name,"Main mission Red Sen spawned was nil spawning in new unit"})
-        self.RedSenSpawned = 0
       end
+    else
+      self.RedSenSpawned = self.RedSenSpawn:Spawn()
     end
      disallowbluesen()
     if self.sensqn ~= nil then
@@ -2289,6 +2276,7 @@ function RIB:RInsurgents()
   end
   if PersistedStore.kutaisi == 2 or PersistedStore.kutaisi == 0 then
     KUTOWNER = 2
+    self.RedKutSpawned = 0
     BASE:E({self.name,"Spawning Blue KUT Defenses, opening blue slots"})
     if mainmission.BlueKutSpawned ~= 0 then
       BASE:E({self.name,"Main mission blue kutspawned was not nil trying to find.",mainmission.BlueKutSpawned})
@@ -2296,13 +2284,15 @@ function RIB:RInsurgents()
         self.BlueKutSpawned = GROUP:FindByName(mainmission.BlueKutSpawned)
       else
         BASE:E({self.name,"Main mission blue Kutspawned was nil so = 0"})
-        self.BlueKutSpawned = 0
       end
+    else
+      self.BlueKutSpawned = self.BlueKutSpawn:Spawn()
     end
          MESSAGE:New("INIT KUT OWNED BY BLUE",30):ToAll()
             allowbluekut()
     else
      KUTOWNER = 1
+     self.BlueKutSpawned = 0
      MESSAGE:New("INIT KUT OWNED BY RED",30):ToAll()
      BASE:E({self.name,"Spawning RAFD Kut Defenses, opening blue slots"})
      if mainmission.RedKutSpawned ~= 0 then
@@ -2313,6 +2303,8 @@ function RIB:RInsurgents()
           BASE:E({self.name,"Main mission Red kutspawned was nil setting to 0"})
           self.RedKutSpawned = 0
        end
+     else
+      self.RedKutSpawned = self.RedKutSpawn:Spawn()
      end
      disallowbluekut()
      if self.kutsqn ~= nil then
@@ -2323,16 +2315,16 @@ function RIB:RInsurgents()
   end
   if (PersistedStore.sukhumi == 1) or (PersistedStore.sukhumi == 0) then
     BASE:E({self.name,"Red Spawning Sukhumi Defenses."})
+    self.BlueSukSpawned = 0
     if mainmission.RedSukSpawned ~= 0 then
       BASE:E({self.name,"Main mission Red Sukspawned was not nil trying to find.",mainmission.RedSukSpawned})
       if GROUP:FindByName(mainmission.RedSukSpawned) ~= nil then
         self.RedSukSpawned = GROUP:FindByName(mainmission.RedSukSpawned)
       else
         BASE:E({self.name,"RedSukSpawned Find BY name on group == nil setting to 0"})
-        self.RedSukSpawned = 0
       end
     else
-      self.RedSukSpawned = 0
+      self.RedSukSpawned = self.RedSukDefSpawn:Spawn()
     end
     SUKOWNER = 1
     MESSAGE:New("INIT SUK OWNED BY RED",30):ToAll() 
@@ -2341,6 +2333,7 @@ function RIB:RInsurgents()
           BASE:E({self.name,"Blue Slots Should be Closed at Suk"})          
   elseif PersistedStore.sukhumi == 2 then
     SUKOWNER = 2
+    self.RedSukSpawned = 0 
     BASE:E({self.name,"Blue Spawning Sukhumi Defenses."})
          MESSAGE:New("INIT Suk OWNED BY Blue",30):ToAll()
     if mainmission.BlueSukSpawned ~= 0 then
@@ -2349,10 +2342,9 @@ function RIB:RInsurgents()
         self.BlueSukSpawned = GROUP:FindByName(mainmission.BlueSukSpawned)
       else
         BASE:E({self.name,"BlueSukSpawned returned nil setting to 0"})
-        self.BlueSukSpawned = 0
       end
     else
-        self.BlueSukSpawned = 0
+        self.BlueSukSpawned = self.BlueSukDefSpawn:Spawn()
     end
          allowbluesuk()
          disallowredsuk()
@@ -2363,31 +2355,29 @@ function RIB:RInsurgents()
   if (PersistedStore.gudauta == 1) or (PersistedStore.gudauta == 0) then
      GUDOWNER = 1
      BASE:E({self.name,"Red Spawning Guduata Defences"})
+     self.BlueGudSpawned = 0
     if mainmission.RedGudSpawned ~= 0 then
       BASE:E({self.name,"Main mission Red Gudspawned was not nil trying to find.",mainmission.RedGudSpawned})
-      if GROUP:FindByName(mainmisson.RedGudSpawned) ~= nil then
+      if GROUP:FindByName(mainmission.RedGudSpawned) ~= nil then
         self.RedGudSpawned = GROUP:FindByName(mainmission.RedGudSpawned)
-      else
-        self.RedGudSpawned = 0
       end
     else
-      self.RedGudSpawned = 0
+      self.RedGudSpawned = self.RedGudDefSpawn:Spawn()
     end
      MESSAGE:New("INIT: GUD OWNED BY RED",30):ToAll()
      disallowbluegud()
      allowredgud()
   elseif PersistedStore.gudauta == 2 then
      GUDOWNER = 2
+     self.RedGudSpawned = 0
      BASE:E({self.name,"Blue Spawning Guduata Defences"})
      if mainmission.BlueGudSpawned ~= 0 then
       BASE:E({self.name,"Main mission Blue Gudspawned was not nil trying to find.",mainmission.BlueGudSpawned})
       if GROUP:FindByName(mainmission.BlueGudSpawned) ~= nil then
         self.BlueGudSpawned = GROUP:FindByName(mainmission.BlueGudSpawned)
-      else
-        self.BlueGudSpawned = 0
       end
      else
-      self.BlueGudSpawned = 0
+      self.BlueGudSpawned = self.BluGudDefSpawn:Spawn()
     end
      self.BluGudDef = self.BluGudDefSpawn:Spawn()
      MESSAGE:New("INIT GUD OWNED BY BLUE",30):ToAll()
@@ -2975,13 +2965,6 @@ ra2adisp:SetSquadronCap("MaySqn",RCAP2,UTILS.FeetToMeters(14000),UTILS.FeetToMet
 ra2adisp:SetSquadronCapInterval("MaySqn",1,(60*5),(60*15),1.0)
 ra2adisp:SetSquadronGci("SochiSqn",UTILS.KnotsToKmph(450),UTILS.KnotsToKmph(650))
 
-
---[[
-mainthread.novosqn = spawnA2ACap("NovoSqn",novo,RCAPTEMPLATES,2,math.random(12,32),RCAP,RAS,120,15000,35000,300,450,600,0.5)
-mainthread.mozsqn = spawnA2ACap("MozSqn",novo,RCAPTEMPLATES,2,math.random(12,32),RCAP3,RAS,120,15000,35000,300,450,600,0.5)
-mainthread.maysqn = spawnA2ACap("MaySqn",may,RCAPTEMPLATES,2,math.random(12,32),RCAP2,RAS,120,15000,35000,300,500,600,0.5)
-mainthread.krassqn = spawnA2ACap("KrasSqn",kras,RCAPTEMPLATES,2,math.random(12,32),RCAP3,RAS,120,15000,35000,300,450,120,0.5)
-]]
 mainthread.kobsqn = spawnA2ACap("kobSqn",kob,BCAPTEMPLATES,1,math.random(12,24),BCAP,BAS,120,15000,35000,300,450,(60*2),(60*15),0.5)
 mainthread.kutsqn = spawnA2ACap("kutSqn",kut,BCAPTEMPLATES,1,math.random(12,24),BCAP2,BAS,120,15000,35000,300,450,(60*2),(60*15),0.5)
 mainthread.sensqn = spawnA2ACap("senSqn",sen,BCAPTEMPLATES,1,math.random(12,24),BCAP3,BAS,120,15000,35000,300,450,(60*2),(60*15),0.5)

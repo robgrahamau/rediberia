@@ -1744,12 +1744,12 @@ function ctld.generateTroopTypes(_side, _countOrTemplate, _country)
 
             local _unitId = ctld.getNextUnitId()
 
-            _troops[_i] = { type = _unitType, unitId = _unitId, name = string.format("Dropped %s #%i", _unitType, _unitId) }
+            _troops[_i] = { type = _unitType, unitId = _unitId, name = string.format("ctld Dropped %s #%i", _unitType, _unitId) }
         end
     end
 
     local _groupId = ctld.getNextGroupId()
-    local _details = { units = _troops, groupId = _groupId, groupName = string.format("Dropped Group %i", _groupId), side = _side, country = _country }
+    local _details = { units = _troops, groupId = _groupId, groupName = string.format("ctld Dropped Group %i", _groupId), side = _side, country = _country }
 
     return _details
 end
@@ -1844,12 +1844,12 @@ function ctld.generateVehiclesForTransport(_side, _country)
 
         local _unitId = ctld.getNextUnitId()
 
-        _vehicles[_i] = { type = _type, unitId = _unitId, name = string.format("Dropped %s #%i", _type, _unitId) }
+        _vehicles[_i] = { type = _type, unitId = _unitId, name = string.format("ctld Dropped %s #%i", _type, _unitId) }
     end
 
 
     local _groupId = ctld.getNextGroupId()
-    local _details = { units = _vehicles, groupId = _groupId, groupName = string.format("Dropped Group %i", _groupId), side = _side, country = _country }
+    local _details = { units = _vehicles, groupId = _groupId, groupName = string.format("ctld Dropped Group %i", _groupId), side = _side, country = _country }
 
     return _details
 end
