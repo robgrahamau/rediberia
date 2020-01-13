@@ -49,6 +49,13 @@ local SaveSchedulePersistence=60 --how many seconds between each check of all th
     ["BlueArmySpawned"] = 0,
     ["BlueArmy1Spawned"] = 0,
     ["BlueArmy2Spawned"] = 0,
+    ["novosqnsize"] = 32,
+    ["maysqnsize"] = 24,
+    ["mozsqnsize"] = 24,
+    ["krazsqnsize"] = 24,
+    ["sochisqnsize"] = 12,
+    ["redgroundsupply"] = 0,
+    ["redairsupply"] = 0,
   }
 local savefilename = "mainmissionsave.lua"
  
@@ -269,6 +276,43 @@ function savenewpersistence(RedSukSpawned,RedGudSpawned,RedSenSpawned,RedKutSpaw
     else
       mainmission.BlueArmy2Spawned = 0
     end
+  end
+  if novosqnsize ~= nil then
+    mainmission.novosqnsize = novosqnsize
+  else
+    mainmission.novosqnsize = 32
+  end
+  if maysqnsize ~= nil then
+    mainmission.maysqnsize = maysqnsize
+  else
+    mainmission.maysqnsize = 24  
+  end
+  if mozsqnsize ~= nil then
+    mainmission.mozsqnsize = mozsqnsize
+  else
+    mainmission.mozsqnsize = 24
+  end
+  if krazsqnsize ~= nil then
+    mainmission.krazsqnsize = krazsqnsize
+  else
+    mainmission.krazsqnsize = 24
+  end
+  if sochisqnsize ~= nil then
+    mainmission.sochisqnsize = sochisqnsize
+  else
+    mainmission.sochisqnsize = 12
+  end
+  if redgroundsupply ~= nil then
+    mainmission.redgroundsupply = redgroundsupply
+  else
+    BASE:E({"Warning rib save saw a nil value on redground supply! setting to 200"})
+    redgroundsupply = 200
+  end
+  if redairsupply ~= nil then
+    mainmission.redairsupply = redairsupply
+  else
+    BASE:E({"Warning rib save saw a nil value on redground supply! setting to 4"})
+    mainmission.redairsupply = 4
   end
   BASE:E({"DONE RUNNING PERSISTENCE FOR MAINMISSION"})
   BASE:E({"Our Thread table is",ourthread})

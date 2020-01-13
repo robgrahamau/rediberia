@@ -118,8 +118,8 @@ if PersistedStore.resetall == 0 then
     ctld.droppedVehiclesRED = ctldsave[4]
     ctld.droppedVehiclesBLUE = ctldsave[5]
     ctld.jtacUnits = ctldsave[6]
-    ctld.builtFOBS = ctldsave[7]
-    ctld.logisticUnits = ctldsave[8]
+    --ctld.builtFOBS = ctldsave[7]
+    --ctld.logisticUnits = ctldsave[8]
     env.info("Main Mission: Existing database, loading from File.")
     BASE:E({ctldsave})
     ctldper = true

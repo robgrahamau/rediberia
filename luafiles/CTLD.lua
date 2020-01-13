@@ -213,7 +213,42 @@ ctld.transportPilotNames = {
     "RAA SA342MINI #001",
     "RAA Huey Suk #001",
     "RAA Huey Suk",
-
+    "RAA KA50",
+    "RAA KA50 #001",
+    "UA - KA50 - Sukhumi - Cold #001",
+    "UA - KA50 - Sukhumi - Cold",
+    "UA - KA50 - Sukhumi - Cold #002",
+    "UA - KA50 - Sukhumi - Cold #003",
+    "UA - MI8 - Sukhumi - Cold #001",
+    "UA - MI8 - Sukhumi - Cold",
+    "GAA KA50 - C&D -FOB",
+    "GAA KA50 - C&D -FOB #001",
+    "RUS UH-1 SOCHI #003",
+    "RUS UH-1 SOCHI #002",
+    "RUS UH-1 SOCHI #001",
+    "RUS UH-1 SOCHI",
+    "RUS UH-1 FOP1",
+    "RUS UH-1 FOP1 #001",
+    "RUS UH-1 FOP1 #002",
+    "RUS UH-1 FOP1 #003",
+    "RUS KA50 C&D - FOP",
+    "RUS KA50 C&D - FOP #001",
+    "RUS KA50 C&D - FOP #002",
+    "RUS KA50 C&D - FOP #003",
+    "RUS UH-1 MAYKOP",
+    "RUS UH-1 MAYKOP #001",
+    "RUS UH-1 MAYKOP #002",
+    "RUS UH-1 MAYKOP #003",
+    "UA - KA50 - Gudauta - Cold #002",
+    "UA - KA50 - Gudauta - Cold",
+    "UA - KA50 - Gudauta - Cold #001",
+    "USAA - UH1 - Gudauta - Cold",
+    "USAA - UH1 - Gudauta - Cold #001",
+    "UA - MI8 - Gudauta - Cold",
+    "RUS - MI8 GUD",
+    "RUS - MI8 GUD #001",
+    "RUS - KA50 GUD",
+    "RUS - KA50 GUD #001",
     -- *** AI transports names (different names only to ease identification in mission) ***
 
     -- Use any of the predefined names or set your own ones
@@ -301,6 +336,7 @@ ctld.unitActions = {
      ["SA342Mistral"] = {crates=true, troops=true},
      ["SA342L"] = {crates=false, troops=true},
      ["SA342M"] = {crates=false, troops=true},
+     ["Ka-50"] = {crates = true, troops=false}
 
 }
 
@@ -350,8 +386,8 @@ ctld.spawnableCrates = {
         { weight = 250, desc = "SPH 2S19 Msta", unit = "SAU Msta", side = 1, cratesRequired = 3 },
         { weight = 255, desc = "M-109", unit = "M-109", side = 2, cratesRequired = 3 },
 
-        { weight = 252, desc = "Ural-375 Ammo Truck", unit = "Ural-375", side = 1, cratesRequired = 2 },
-        { weight = 253, desc = "M-818 Ammo Truck", unit = "M 818", side = 2, cratesRequired = 2 },
+        { weight = 252, desc = "Ural-375 Ammo Truck", unit = "Ural-375", side = 1, cratesRequired = 1 },
+        { weight = 253, desc = "M-818 Ammo Truck", unit = "M 818", side = 2, cratesRequired = 1 },
 
         { weight = 800, desc = "FOB Crate - Small", unit = "FOB-SMALL" }, -- Builds a FOB! - requires 3 * ctld.cratesRequiredForFOB
     },
@@ -382,8 +418,8 @@ ctld.spawnableCrates = {
 
         { weight = 595, desc = "Early Warning Radar", unit = "1L13 EWR", side = 1 }, -- cant be used by BLUE coalition
 
-        { weight = 405, desc = "Strela-1 9P31", unit = "Strela-1 9P31", side = 1, cratesRequired = 3 },
-        { weight = 400, desc = "M1097 Avenger", unit = "M1097 Avenger", side = 2, cratesRequired = 3 },
+        { weight = 405, desc = "Strela-1 9P31", unit = "Strela-1 9P31", side = 1, cratesRequired = 2 },
+        { weight = 400, desc = "M1097 Avenger", unit = "M1097 Avenger", side = 2, cratesRequired = 2 },
 
     },
 }

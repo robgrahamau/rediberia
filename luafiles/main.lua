@@ -1,5 +1,5 @@
-version = "2.2.4"
-lastupdate = "10-JAN-2020 2040AUEDST"
+version = "2.2.7"
+lastupdate = "14-JAN-2020 0400AUEDST"
 
 env.info("----------------------------------------------------------")
 env.info("--------------RED IBERIA VERSION ".. version .."----------------------")
@@ -126,6 +126,31 @@ novo1 = 0
 may1 = 0
 moz1 = 0
 kraz1 = 0
+novosqnsize = 32
+maysqnsize = 24
+mozsqnsize = 24
+krazsqnsize = 24
+sochisqnsize = 12
+redgroundsupply = 200
+redairsupply = 0
+nfmc = ZONE:New("nozinfo")
+nfmc = nfmc:GetCoordinate()
+nfm = nfmc:MarkToAll("Noz Factory Awaiting Sat Pass",true)
+kfmc = ZONE:New("krasinfo")
+kfmc = kfmc:GetCoordinate()
+kfm = kfmc:MarkToAll("Krasnador Factory Awaiting Sat Pass",true)
+apsmc = ZONE:New("apsinfo")
+apsmc = apsmc:GetCoordinate()
+apsm = apsmc:MarkToAll("Apsheronsk Factory Awaiting Sat Pass",true)
+cfmc = ZONE:New("cherkinfo")
+cfmc = cfmc:GetCoordinate()
+cfm = cfmc:MarkToAll("Cherkessk Factory Awaiting Sat Pass",true)
+mfmc = ZONE:New("mayskiyinfo")
+mfmc = mfmc:GetCoordinate()
+mfm = mfmc:MarkToAll("Mayskiy Factory Awaiting Sat Pass",true)
+gfmc = ZONE:New("gleninfo")
+gfmc = gfmc:GetCoordinate()
+gfm = gfmc:MarkToAll("Gelendzhik Factory Awaiting Sat Pass",true)
 do
 _mc = mozcommand:GetCoordinate()
 _nc = novocommand:GetCoordinate()
@@ -199,6 +224,14 @@ dko = KOBZONE:GetCoordinate()
 PlayerMap = {}
 PlayerRMap = {}
 PlayerBMap = {}
+glz = ZONE:New("GUDLOG")
+glzc = glz:GetCoordinate()
+glr = nil
+glb = nil
+slz = ZONE:New("SUKLOG")
+slzc = slz:GetCoordinate()
+slb = nil
+slr = nil
 local PlayerMenuMap = {}
 BAICAP = GROUP:FindByName("BAI_CAP")
 BAICAPSpawn = SPAWN:NewWithAlias("BAI_CAP","UZI88"):InitCleanUp(360):OnSpawnGroup(function(SpawnGroup) 
@@ -292,6 +325,7 @@ end
     trigger.action.setUserFlag("USAF - F16 - Kob - C&D #002",0)
     trigger.action.setUserFlag("USAF - F16 - Kob - C&D #003",0)
     BASE:E({"Blue Slots allowed at Kobuletie"})
+    
   end
   --- disables blue forces at kobulette.
   -- @param nil.
@@ -548,6 +582,31 @@ function allowbluesuk()
   trigger.action.setUserFlag("RAA Huey Suk",0)
   trigger.action.setUserFlag("RAA Huey Suk #001",0)
   BASE:E({"Blue Slots Should be Open at Suk"})
+  slzc:Explosion(300,0)
+  BASE:E({"SUK FOB SCHEDULER STARTING 30 SECONDS"})
+  
+    SCHEDULER:New(nil,function() 
+    BASE:E({"SUK FOB SHOULD BE SPAWNING"})
+    local _unitId = ctld.getNextUnitId()
+    local _name = "ctld Sukhimi FOB #" .. _unitId
+    local _crate = {
+      ["category"] = "Fortifications",
+      ["type"] = "outpost",
+      --  ["unitId"] = _unitId,
+      ["y"] = slzc.z,
+      ["x"] = slzc.x,
+      ["name"] = _name,
+      ["canCargo"] = false,
+      ["heading"] = 0,
+      }
+    _crate["country"] = BlueHq:GetCountry()
+    mist.dynAddStatic(_crate)
+    local _fob = StaticObject.getByName(_crate["name"])
+    table.insert(ctld.logisticUnits, _fob:getName())
+    table.insert(ctld.builtFOBS, _fob:getName())
+    MESSAGE:New("Sukhimi Slots Unlocked on Blue Side, Logistics Building Avalible",15):ToBlue()
+    BASE:E({"SUK FOB SHOULD BE SPAWNED"})
+    end,{},30)
 end
 
 --- close red slots at sukhumi
@@ -593,6 +652,31 @@ function allowredsuk()
   trigger.action.setUserFlag("RUS F18C - SUK C&D",0)
   trigger.action.setUserFlag("RUS F18C - SUK C&D #100",0)
   BASE:E({"Red Slots Should be open at Suk"})
+    slzc:Explosion(300,0)
+    BASE:E({"SUK FOB SHOULD BE SPAWNING 30 seconds"})
+  
+    SCHEDULER:New(nil,function() 
+    BASE:E({"SUK FOB SHOULD BE SPAWNING"})
+    local _unitId = ctld.getNextUnitId()
+    local _name = "ctld Sukhimi FOB #" .. _unitId
+    local _crate = {
+      ["category"] = "Fortifications",
+      ["type"] = "outpost",
+      --  ["unitId"] = _unitId,
+      ["y"] = slzc.z,
+      ["x"] = slzc.x,
+      ["name"] = _name,
+      ["canCargo"] = false,
+      ["heading"] = 0,
+      }
+    _crate["country"] = RedHq:GetCountry()
+    mist.dynAddStatic(_crate)
+    local _fob = StaticObject.getByName(_crate["name"])
+    table.insert(ctld.logisticUnits, _fob:getName())
+    table.insert(ctld.builtFOBS, _fob:getName())
+    MESSAGE:New("Sukhimi Slots Unlocked on Blue Side, Logistics Building Avalible",15):ToRed()
+    BASE:E({"SUK FOB SHOULD BE SPAWNED"})
+    end,{},30)
 end
 
 --- open blue slots at gudauta
@@ -606,6 +690,31 @@ function allowbluegud()
   trigger.action.setUserFlag("UA - MI8 - Gudauta - Cold",0)
   trigger.action.setUserFlag("UA - MI8 - Gudauta - Cold #001",0)
   BASE:E({"Blue Slots should be open at Gudauta"})
+  glzc:Explosion(300,0)
+  BASE:E({"Gud GUD SHOULD BE SPAWNING 30 SECONDS"})
+  
+  SCHEDULER:New(nil,function() 
+    BASE:E({"GUD FOB SHOULD BE SPAWNING"})
+    local _unitId = ctld.getNextUnitId()
+    local _name = "ctld Gud FOB #" .. _unitId
+    local _crate = {
+      ["category"] = "Fortifications",
+      ["type"] = "outpost",
+      --  ["unitId"] = _unitId,
+      ["y"] = glzc.z,
+      ["x"] = glzc.x,
+      ["name"] = _name,
+      ["canCargo"] = false,
+      ["heading"] = 0,
+      }
+    _crate["country"] = BlueHq:GetCountry()
+    mist.dynAddStatic(_crate)
+    local _fob = StaticObject.getByName(_crate["name"])
+    table.insert(ctld.logisticUnits, _fob:getName())
+    table.insert(ctld.builtFOBS, _fob:getName())
+    MESSAGE:New("Guduata Slots Unlocked on Blue Side, Logistics Building Avalible",15):ToBlue()
+    BASE:E({"GUD FOB SHOULD BE SPAWNED"})
+    end,{},30)
 end
 
 --- close red slots at gudauta
@@ -649,6 +758,31 @@ function allowredgud()
   trigger.action.setUserFlag("RUS - JF17 - GUD C&D",0)
   trigger.action.setUserFlag("RUS - JF17 - GUD C&D #001",0)
   BASE:E({"Red slots should be open at Gud."})
+  glzc:Explosion(300,0)
+  BASE:E({"GUD FOB SHOULD BE SPAWNING 30 SECONDS"})
+  
+  SCHEDULER:New(nil,function()
+    BASE:E({"GUD FOB SHOULD BE SPAWNING"}) 
+    local _unitId = ctld.getNextUnitId()
+    local _name = "ctld GUD FOB #" .. _unitId
+    local _crate = {
+      ["category"] = "Fortifications",
+      ["type"] = "outpost",
+      --  ["unitId"] = _unitId,
+      ["y"] = glzc.z,
+      ["x"] = glzc.x,
+      ["name"] = _name,
+      ["canCargo"] = false,
+      ["heading"] = 0,
+      }
+    _crate["country"] = RedHq:GetCountry()
+    mist.dynAddStatic(_crate)
+    local _fob = StaticObject.getByName(_crate["name"])
+    table.insert(ctld.logisticUnits, _fob:getName())
+    table.insert(ctld.builtFOBS, _fob:getName())
+    MESSAGE:New("Guduata Slots Unlocked on Red Side, Logistics Building Avalible",15):ToRed()
+    BASE:E({"GUD FOB SHOULD BE SPAWNED"})
+    end,{},30)
 end
 -- RIB core class
 RIB = {
@@ -1243,12 +1377,18 @@ do
   else
     -- Need to expand this to do checks so we can grind this beast to a halt if need be.
     if RedHq:IsAlive() == true then
-      BASE:E({self.name,"Red Army Dead ReSpawning"})
-      self.RedArmy = self.RedArmySpawn:Spawn()
-      self.RedArmySpawned = self.RedArmy
-      self.RedArmyAlive = 0
-      self.RedArmyState = 0
-      self.RedArmyStateL = 5
+      if redgroundsupply >= 20 then
+        BASE:E({self.name,"Red Army Dead ReSpawning"})
+        self.RedArmy = self.RedArmySpawn:Spawn()
+        self.RedArmySpawned = self.RedArmy
+        self.RedArmyAlive = 0
+        self.RedArmyState = 0
+        self.RedArmyStateL = 5
+        redgroundsupply = redgroundsupply - 20
+      else
+        self.RedArmySpawned = 0
+        BASE:E({self.name,"No Supplies Avalible at the moment! can't spawn Red Army",redgroundsupply})
+      end
     else
       self.RedArmySpawned = 0
       BASE:E({self.name,"Red Headquarters was dead can't resupply and respawn an army if there's no HQ!"})
@@ -1266,12 +1406,18 @@ do
     self.RedArmyY1 = tempvec2.y
   else
     if RedHq:IsAlive() == true then
-      BASE:E({self.name,"Red Army 2 Dead ReSpawning"})
-      self.RedArmy1 = self.RedArmySpawn1:Spawn()
-      self.RedArmy1Spawned = self.RedArmy1
-      self.RedArmyAlive1 = 0
-      self.RedArmyState1 = 0
-      self.RedArmyStateL1 = 5
+      if redgroundsupply >= 20 then
+        BASE:E({self.name,"Red Army 2 Dead ReSpawning"})
+        self.RedArmy1 = self.RedArmySpawn1:Spawn()
+        self.RedArmy1Spawned = self.RedArmy1
+        self.RedArmyAlive1 = 0
+        self.RedArmyState1 = 0
+        self.RedArmyStateL1 = 5
+        redgroundsupply = redgroundsupply - 20
+      else
+        self.RedArmy1Spawned = 0
+        BASE:E({self.name,"No Supplies Avalible at the moment! can't spawn Red Army 1",redgroundsupply})
+      end
     else
       self.RedArmy1Spawned = 0
       BASE:E({self.name,"Red Headquarters was dead can't resupply and respawn an army if there's no HQ!"})
@@ -2204,7 +2350,18 @@ function RIB:RInsurgents()
   PersistedStore.round = round
   PersistedStore.lastround = lastround
   BASE:E({"ROUND COUNTER UPDATE PS",PersistedStore.round,PersistedStore.lastround})
-  
+  if mainmission.redgroundsupply ~= nil then
+    redgroundsupply = mainmission.redgroundsupply
+  else
+    redgroundsupply = 200
+    BASE:E({self.name,"redgroundsupply returned NIL setting to 200"})
+  end
+  if mainmission.redairsupply ~= nil then
+    redairsupply = mainmission.redairsupply
+  else
+    redairsupply = 4
+    BASE:E({self.name,"redairsupply returned nil setting to 4."})
+  end
   if PersistedStore.noclients ~= nil then
     noclients = PersistedStore.noclients
   else
@@ -3004,44 +3161,56 @@ SCHEDULER:New(nil,function()
   mainthread:Gunships()
   if flipflop == false then
     flipflop = true
-    BASE:E({"Getting Squadron amounts if any under 12 give them 4 new units if factory units alive"})
+    BASE:E({"Getting Squadron amounts if any under strength give them 4 new units if factories have made new fighters"})
     if novocommand:IsAlive() == true then
-      if RSweepAmount < 8 then
-        RSweepAmount = RSweepAmount + 2
-      end
       sqn = "NovoSqn"
       BASE:E({"Novorossiysk Sqn Amount is",ra2adisp:GetSquadronAmount(sqn)})
       local _amount = ra2adisp:GetSquadronAmount(sqn)
-      if _amount < 8 then
-        local addamount = math.random(2,6)
-        ra2adisp:ReinforceSquadron(sqn,(_amount + addamount))
-        local _amount2 = ra2adisp:GetSquadronAmount(sqn)
-        MESSAGE:New("Novorossiysk CAP Sqn was just reinforced with ".. addamount .. "New Aircraft")
-        BASE:E({"Novorossiysk Sqn Amount after add is",ra2adisp:GetSquadronAmount(sqn)})
+      if _amount <= 24 then
+        if redairsupply > 8 then
+          local addamount = math.random(1,4)
+          redairsupply = redairsupply - addamount
+          ra2adisp:ReinforceSquadron(sqn,(_amount + 4))
+          local _amount2 = ra2adisp:GetSquadronAmount(sqn)
+          MESSAGE:New("Novorossiysk CAP Sqn was just reinforced with ".. addamount .. " New Aircraft",5):ToRed()
+          BASE:E({"Novorossiysk Sqn Amount after add is",ra2adisp:GetSquadronAmount(sqn)})
+        else
+          BASE:E({"Novorossiysk Sqn Amount after add should not have incrased as no resources avalible",ra2adisp:GetSquadronAmount(sqn)})
+        end
       end
     end
     if mozcommand:IsAlive() == true then
     sqn = "MozSqn"
       BASE:E({"MozSqn Amount is",ra2adisp:GetSquadronAmount(sqn)})
       local _amount = ra2adisp:GetSquadronAmount(sqn)
-      if _amount < 8 then
-        local addamount = math.random(2,6)
-        ra2adisp:ReinforceSquadron(sqn,(_amount + addamount))
-        local _amount2 = ra2adisp:GetSquadronAmount(sqn)
-        MESSAGE:New("Mozdok CAP Sqn was just reinforced with ".. addamount .. "New Aircraft")
-        BASE:E({"Moz Sqn Amount after add is",ra2adisp:GetSquadronAmount(sqn)})
-      end
+      if _amount < 18 then
+        if redairsupply > 8 then
+          local addamount = math.random(1,4)
+          redairsupply = redairsupply - addamount
+          ra2adisp:ReinforceSquadron(sqn,(_amount + addamount))
+          local _amount2 = ra2adisp:GetSquadronAmount(sqn)
+          MESSAGE:New("Mozdok CAP Sqn was just reinforced with ".. addamount .. " New Aircraft",5):ToRed()
+          BASE:E({"Moz Sqn Amount after add is",ra2adisp:GetSquadronAmount(sqn)})
+        else
+          BASE:E({"Moz Sqn Amount after add is should be the same as before no resources",ra2adisp:GetSquadronAmount(sqn)})
+        end
+     end
     end
     if maycommand:IsAlive() == true then
       sqn = "MaySqn"
       BASE:E({"Novorossiysk Sqn Amount is",ra2adisp:GetSquadronAmount(sqn)})
       local _amount = ra2adisp:GetSquadronAmount(sqn)
-      if _amount < 8 then
-        local addamount = math.random(2,6)
-        ra2adisp:ReinforceSquadron(sqn,(_amount + addamount))
-        local _amount2 = ra2adisp:GetSquadronAmount(sqn)
-        MESSAGE:New("Maydok CAP Sqn was just reinforced with ".. addamount .. "New Aircraft")
-        BASE:E({"May Sqn Amount after add is",ra2adisp:GetSquadronAmount(sqn)})
+      if _amount < 18 then
+        if redairsupply > 8 then
+          local addamount = math.random(1,4)
+          redairsupply = redairsupply - addamount
+          ra2adisp:ReinforceSquadron(sqn,(_amount + addamount))
+          local _amount2 = ra2adisp:GetSquadronAmount(sqn)
+          MESSAGE:New("Maydok CAP Sqn was just reinforced with ".. addamount .. " New Aircraft",5):ToRed()
+          BASE:E({"May Sqn Amount after add is",ra2adisp:GetSquadronAmount(sqn)})
+        else
+          BASE:E({"May Sqn Amount after add should be the same as before no resources",ra2adisp:GetSquadronAmount(sqn)})
+        end
       end
     end
     if krazcommand:IsAlive() == true then
@@ -3051,26 +3220,255 @@ SCHEDULER:New(nil,function()
       sqn = "KrasSqn"
       BASE:E({"Kras Sqn Amount is",ra2adisp:GetSquadronAmount(sqn)})
       local _amount = ra2adisp:GetSquadronAmount(sqn)
-      if _amount < 8 then
-        local addamount = math.random(2,6)
-        ra2adisp:ReinforceSquadron(sqn,(_amount + addamount))
-        local _amount2 = ra2adisp:GetSquadronAmount(sqn)
-        MESSAGE:New("Krasnador CAP Sqn was just reinforced with ".. addamount .. "New Aircraft")
-        BASE:E({"Kras Sqn Amount after add is",ra2adisp:GetSquadronAmount(sqn)})
+      if _amount < 18 then
+         if redairsupply > 8 then
+          local addamount = math.random(2,4)
+          redairsupply = redairsupply - addamount
+          ra2adisp:ReinforceSquadron(sqn,(_amount + addamount))
+          local _amount2 = ra2adisp:GetSquadronAmount(sqn)
+          MESSAGE:New("Krasnador CAP Sqn was just reinforced with ".. addamount .. " New Aircraft",5):ToRed()
+          BASE:E({"Kras Sqn Amount after add is",ra2adisp:GetSquadronAmount(sqn)})
+        else
+          BASE:E({"Kras Sqn Amount after add is should be the same as before as no new production",ra2adisp:GetSquadronAmount(sqn)})
+        end
       end
       sqn = "SochiSqn"
       BASE:E({"Sochi Sqn Amount is",ra2adisp:GetSquadronAmount(sqn)})
       local _amount = ra2adisp:GetSquadronAmount(sqn)
-      if _amount < 2 then
-        local addamount = math.random(2,6)
-        ra2adisp:ReinforceSquadron(sqn,(_amount + addamount))
-        local _amount2 = ra2adisp:GetSquadronAmount(sqn)
-        MESSAGE:New("Sochi Adler GCI Sqn was just reinforced with ".. addamount .. "New Aircraft")
-        BASE:E({"Sochi Sqn Amount after add is",ra2adisp:GetSquadronAmount(sqn)})
+      if _amount < 8 then
+        if redairsupply > 4 then
+          local addamount = math.random(1,4)
+          redairsupply = redairsupply - addamount
+          ra2adisp:ReinforceSquadron(sqn,(_amount + addamount))
+          local _amount2 = ra2adisp:GetSquadronAmount(sqn)
+          MESSAGE:New("Sochi Adler GCI Sqn was just reinforced with ".. addamount .. " New Aircraft",5):ToRed()
+          BASE:E({"Sochi Sqn Amount after add is",ra2adisp:GetSquadronAmount(sqn)})
+        else
+          BASE:E({"Sochi Sqn Amount after add should be the same as before as no new production",ra2adisp:GetSquadronAmount(sqn)})
+        end
       end
     end
   else
     flipflop = false
+    local gfact = 0
+    local nfact = 0
+    local mfact = 0 
+    local kfact = 0
+    local cfact = 0
+    local afact = 0
+    if STATIC:FindByName("DEPOT Factory1") ~= nil then
+      if STATIC:FindByName("DEPOT Factory1"):IsAlive() == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + 0.5
+          gfact = gfact + 1
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory2") ~= nil then
+      if STATIC:FindByName("DEPOT Factory2"):IsAlive() == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + 0.5
+          gfact = gfact + 2
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory3") ~= nil then
+      if STATIC:FindByName("DEPOT Factory3"):IsAlive() == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + 1
+          gfact = gfact + 3
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory4") ~= nil then
+      if STATIC:FindByName("DEPOT Factory4"):IsAlive() == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + 1
+          gfact = gfact + 4
+        end
+      end
+    end
+ 
+    if STATIC:FindByName("DEPOT Factory5") ~= nil then
+      if STATIC:FindByName("DEPOT Factory5"):IsAlive() == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + 5
+          nfact = nfact + 1
+        end
+      end
+    end
+    nfact = nfact * 100
+    nfmc:RemoveMark(nfm)
+    nfm = nfmc:MarkToAll("Novorossiysk Factory Output Capacity:" .. nfact)
+    if STATIC:FindByName("DEPOT Factory6") ~= nil then
+      if STATIC:FindByName("DEPOT Factory6"):IsAlive() == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + 5
+          mfact = mfact + 1
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory7") ~= nil then
+      if STATIC:FindByName("DEPOT Factory7"):IsAlive() == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + 5
+          mfact = mfact + 1
+        end
+      end
+    end
+    mfact = (mfact / 2) * 100
+    mfmc:RemoveMark(mfm)
+    mfm = mfmc:MarkToAll("Mayskiy Factory Output Capacity:".. mfact) 
+    if STATIC:FindByName("DEPOT Factory8") ~= nil then
+      if STATIC:FindByName("DEPOT Factory8"):IsAlive() == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + 5
+          afact = afact + 1
+        end
+      else
+        BASE:E({"fact8 returning not alive"})
+      end
+    else
+      BASE:E({"fac 8 returning not nil"})
+    end
+    if STATIC:FindByName("DEPOT Factory9") ~= nil then
+      if STATIC:FindByName("DEPOT Factory9"):IsAlive() == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + 5
+          afact = afact +1
+        
+        end
+      else
+        BASE:E({"fact 9 returning not alive"})
+        
+      end
+    else
+      BASE:E({"fac 9 returning not nil"})
+    end
+    if STATIC:FindByName("DEPOT Factory10") ~= nil then
+      if STATIC:FindByName("DEPOT Factory10"):IsAlive() == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + 5
+          afact = afact+1
+        end
+      else
+        BASE:E({"fact 10 returning not alive"})
+        
+      end
+    else
+        BASE:E({"fact 10 returning not alive"})
+        
+    end 
+    afact = (afact / 3) * 100
+    apsmc:RemoveMark(apsm)
+    apsm = apsmc:MarkToAll("Apsheronsk Factory Output Capacity:".. afact,true)
+    if STATIC:FindByName("DEPOT Factory11") ~= nil then
+      if STATIC:FindByName("DEPOT Factory11"):IsAlive() == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + 0.5
+          cfact = cfact + 1
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory12") ~= nil then
+      if STATIC:FindByName("DEPOT Factory12"):IsAlive() == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + 0.5
+          cfact = cfact + 1
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory13") ~= nil then
+      if STATIC:FindByName("DEPOT Factory13"):IsAlive() == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + 0.5
+          cfact = cfact + 1
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory14") ~= nil then
+      if STATIC:FindByName("DEPOT Factory14"):IsAlive() == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + 1
+          cfact = cfact + 1
+        end
+      end
+    end
+    cfact = (cfact / 4) * 100 
+    cfmc:RemoveMark(cfm)
+    cfm = cfmc:MarkToAll("Cherkessk Factory Output Capacity:" .. cfact,true)
+    if STATIC:FindByName("DEPOT Factory15") ~= nil then
+      if STATIC:FindByName("DEPOT Factory15"):IsAlive() == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + 1
+          gfact = gfact + 1
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory16") ~= nil then
+      if STATIC:FindByName("DEPOT Factory16"):IsAlive() == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + 5
+          kfact = kfact + 1
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory17") ~= nil then
+      if STATIC:FindByName("DEPOT Factory17"):IsAlive() == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + 5
+          kfact = kfact + 1
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory18") ~= nil then
+      if STATIC:FindByName("DEPOT Factory18"):IsAlive() == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + 5
+          kfact = kfact + 1
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory19") ~= nil then
+      if STATIC:FindByName("DEPOT Factory19"):IsAlive() == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + 5
+          kfact = kfact + 1
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory20") ~= nil then
+      if STATIC:FindByName("DEPOT Factory20"):IsAlive() == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + 5
+          kfact = kfact + 1
+        end
+      end
+    end
+    kfact = (kfact /5) * 100 
+    kfmc:RemoveMark(kfm)
+    kfm = kfmc:MarkToAll("Krasnador Factory Output Capacity:".. kfact,true)
+    
+    
+    if STATIC:FindByName("DEPOT Factory21") ~= nil then
+      if STATIC:FindByName("DEPOT Factory21"):IsAlive() == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + 1
+          redgroundsupply = redgroundsupply + 5
+        end
+      end
+    end
+    if STATIC:FindByName("DEPOT Factory22") ~= nil then
+      if STATIC:FindByName("DEPOT Factory15"):IsAlive() == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + 1
+          redgroundsupply = redgroundsupply + 5
+        end
+      end
+    end
+    gfact = (gfact / 5 * 100)
+    gfmc:RemoveMark(gfm)
+    gfm = gfmc:MarkToAll("Gelendzhik Factory Output Capacity:" .. gfact)
   end
 end, {}, 75,(30*60))
 
@@ -3097,6 +3495,10 @@ function checkthings()
       end
     --mainthread.novosqn:SpawnScheduleStop()
     end
+  else
+    sqn = "NovoSqn"
+    BASE:E({"Novorossiysk Sqn Amount is",ra2adisp:GetSquadronAmount(sqn)})
+    novosqnsize = ra2adisp:GetSquadronAmount(sqn)
   end
   if maycommand:IsAlive() ~= true then
     if may1 == 0 then
@@ -3116,6 +3518,10 @@ function checkthings()
     end
     -- mainthread.maysqn:SpawnScheduleStop()
     BASE:E("MAY Command is dead stopping sqns")
+  else
+    sqn = "MaySqn"
+    BASE:E({"Maykop Sqn Amount is",ra2adisp:GetSquadronAmount(sqn)})
+    maysqnsize = ra2adisp:GetSquadronAmount(sqn)
   end
   if mozcommand:IsAlive() ~= true then
     if moz1 == 0 then
@@ -3135,7 +3541,11 @@ function checkthings()
       end
     end
     -- mainthread.maysqn:SpawnScheduleStop()
-    BASE:E("MAY Command is dead stopping sqns")
+    BASE:E("Moz Command is dead stopping sqns")
+  else
+    sqn = "MozSqn"
+    BASE:E({"Moz Sqn Amount is",ra2adisp:GetSquadronAmount(sqn)})
+    mozsqnsize = ra2adisp:GetSquadronAmount(sqn)
   end
   
   if krazcommand:IsAlive() ~= true then
@@ -3156,7 +3566,15 @@ function checkthings()
       --mainthread.krassqn:SpawnScheduleStop()
     end
     BASE:E("Kraz Command is dead stopping sqns")
+   else
+    sqn = "KrasSqn"
+    BASE:E({"Kras Sqn Amount is",ra2adisp:GetSquadronAmount(sqn)})
+    krazsqnsize = ra2adisp:GetSquadronAmount(sqn)
   end
+  sqn = "SochiSqn"
+  BASE:E({"Sochi Sqn Amount is",ra2adisp:GetSquadronAmount(sqn)})
+  sochisqnsize = ra2adisp:GetSquadronAmount(sqn)
+  
   if RedHq:IsAlive() ~= true then
     BASE:E("Red HQ Dead")
     if flipflop == false then

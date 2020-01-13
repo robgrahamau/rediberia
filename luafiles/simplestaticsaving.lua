@@ -29,7 +29,7 @@
 local SaveScheduleStatics=60 --how many seconds between each check of all the statics.
 local savefilename = "staticsave.lua"
 local savefile = lfs.writedir() .."rib\\" .. savefilename
-AllStatics = SET_STATIC:New():FilterPrefixes({"DEPOT"}):FilterStart()
+AllStatics = SET_STATIC:New():FilterPrefixes({"DEPOT","CTLD","ctld"}):FilterStart()
  -----------------------------------
  --Do not edit below here
  -----------------------------------
@@ -127,9 +127,7 @@ if file_exists(savefile) then
     coord:Explosion(200) --just a little black mark
     rngsmokes(coord)
   end
-
   end)
-
 else --Save File does not exist we start a fresh table
   SaveStatics={}
 end
@@ -147,15 +145,15 @@ SaveStatics[grp:GetName()] =
  -- ["heading"] = grp:GetHeading(),
   --["groupId"] =grp:GetID(),
  -- ["shape_name"] = "stolovaya",
- -- ["type"] = grp:GetTypeName(),
+   ["type"] = grp:GetTypeName(),
   --["unitId"] = grp:GetID(),
  -- ["rate"] = 100,
   ["name"] = grp:GetName(),
   --["category"] = "Fortifications",
---  ["y"] = grp:GetVec2().y, 
---  ["x"] = grp:GetVec2().x, 
+  ["y"] = grp:GetVec2().y, 
+  ["x"] = grp:GetVec2().x, 
   ["dead"] = Alive(grp),
- -- ["Country"] = grp:GetCountry()
+  ["Country"] = grp:GetCountry()
 }
 
 end)--end of the for each groupAlive iteration
@@ -165,3 +163,6 @@ writemission(newMissionStr, savefile)
 SaveStatics={} --flatten this between iterations to prevent accumulations
 --env.info("Data saved.")
 end, {}, 1, SaveScheduleStatics)
+
+
+AI_AWACS:
