@@ -163,6 +163,3 @@ writemission(newMissionStr, savefile)
 SaveStatics={} --flatten this between iterations to prevent accumulations
 --env.info("Data saved.")
 end, {}, 1, SaveScheduleStatics)
-
-
-AI_AWACS:
