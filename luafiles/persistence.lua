@@ -76,6 +76,8 @@ local SaveSchedulePersistenceStore=60 --how many seconds between each check of a
     ["NovoRound"] = 0,
     ["MayCommand"] = 1,
     ["MayRound"] = 1,
+    ["FactoryLast"] = 0,
+    ["ReinforceLast"] = 0,
 }
 PersistedStore = {
     ["round"] = 1,
@@ -119,6 +121,8 @@ PersistedStore = {
     ["NovoRound"] = 0,
     ["MayCommand"] = 1,
     ["MayRound"] = 1,
+    ["FactoryLast"] = 0,
+    ["ReinforceLast"] = 0,
 }
 
 local savefilename = "gfalls.lua"

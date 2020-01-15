@@ -1,5 +1,5 @@
-version = "2.2.7"
-lastupdate = "14-JAN-2020 0400AUEDST"
+version = "2.2.9"
+lastupdate = "15-JAN-2020 2000AUEDST"
 
 env.info("----------------------------------------------------------")
 env.info("--------------RED IBERIA VERSION ".. version .."----------------------")
@@ -7,7 +7,9 @@ env.info("--------------last update:" .. lastupdate .. "------------------------
 env.info("--------------By Robert Graham for TGW -------------------")
 env.info("--------------USES MOOSE AND CTDL ------------------------")
 do
+nowtime = os.time()
 nowTable = os.date('*t')
+nowDate = os.date()
 nowYear = nowTable.year
 nowMonth = nowTable.month
 nowDay = nowTable.day
@@ -24,6 +26,8 @@ end
 
 restarttime = "" .. restarthour ..":".. nowminute ..""
 end
+env.info("---------- Date Time:" .. nowDate .. "-------------------")
+env.info("---------- now Time:" .. nowtime .. "------------------")
 env.info("---------- start time:".. starttime .. "------------------")
 env.info("---------- restart time:".. restarttime .. "------------------")
 trigger.action.setUserFlag("SSB",100)
@@ -80,12 +84,14 @@ end
 -------- Main CONSTANT Variables ----------
 roundreset = 8 -- This sets how many rounds before we reset to round one. each round is 6 hours so 4 = 24, 8 = 48. etc.
 ribadmin = false
+pstatic = false
 JTAC_COOLDOWN = (10)*60
 F15_COOLDOWN = (2)*60
 SU27_COOLDOWN = (2)*60
 TANKER_COOLDOWN = (15)*60
 Round_COOLDOWN = ((60*60)*5)+(60*50)
 CurrentRound = 0
+commandrebuild = ((60*60) * 72) -- 72 hours.
 LastRound = 0
 round_Timer = 0
 F15_Timer = 0
@@ -96,6 +102,8 @@ ARC_Timer = 0
 ARC2_Timer = 0
 RSHEL2_Timer = 0
 lastclientcount = 0
+factorytime = (60 * 60) * 2 -- Reinforce every 2 hours.  
+reinforcehours = (60 * 60) * 1 -- 1 hour
 noclients = 0
 nooclients = true
 RESETALL = 0
@@ -135,7 +143,7 @@ redgroundsupply = 200
 redairsupply = 0
 nfmc = ZONE:New("nozinfo")
 nfmc = nfmc:GetCoordinate()
-nfm = nfmc:MarkToAll("Noz Factory Awaiting Sat Pass",true)
+nfm = nfmc:MarkToAll("Novorossiysk Factory Awaiting Sat Pass",true)
 kfmc = ZONE:New("krasinfo")
 kfmc = kfmc:GetCoordinate()
 kfm = kfmc:MarkToAll("Krasnador Factory Awaiting Sat Pass",true)
@@ -178,7 +186,7 @@ BCAPTEMPLATES = {"SQN147-1","SQN147-2","SQN147-2"}
 BDETGROUP = SET_GROUP:New():FilterPrefixes({"BEWR","Overlord","Magic","BSAM",}):FilterStart()
 SetPlayer = SET_CLIENT:New():FilterStart()
 SetPlayerRed = SET_CLIENT:New():FilterCoalitions("red"):FilterStart()
-SetPlayerBlue = SET_CLIENT:New():FilterCoalitions("red"):FilterStart()
+SetPlayerBlue = SET_CLIENT:New():FilterCoalitions("blue"):FilterStart()
 Scoring = SCORING:New("Scoring")
 redobject = ""
 rcomms = ""
@@ -2837,11 +2845,14 @@ function RIB:RInsurgents()
   BASE:E({self.name,"Command Center Novo"})
   if PersistedStore.NovoCommand ~= nil then
     if PersistedStore.NovoCommand == 0 then
-      if PersistedStore.NovoRound ~= CurrentRound then
+      if nowtime < (PersistedStore.NovoRound + commandrebuild)  then
         if novocommand:IsAlive() == true then
           SCHEDULER:New(nil,function()
            novocommand:Destroy() 
-           BASE:E({self.name,"Novocommand was reported as 0 current round and Novoround don't match destroying",PersistedStore.NovoRound,PersistedStore.NovoCommand})
+           BASE:E({self.name,"Novocommand was reported as 0 current time is less then rebuild don't match destroying",PersistedStore.NovoRound,PersistedStore.NovoCommand})
+          local rbt = os.date('%A, %B %d %Y at %H:%M UTC', (PersistedStore.NovoRound))
+          _nc:RemoveMark(_nm)
+          _nm = _nc:MarkToAll("Novorossisk Command Center, Destroyed rebuild after ".. rbt,true)
           end,{},15)
         
         end
@@ -2858,10 +2869,13 @@ function RIB:RInsurgents()
   BASE:E({self.name,"Command Center May"})
   if PersistedStore.MayCommand ~= nil then
     if PersistedStore.MayCommand == 0 then
-      if PersistedStore.MayRound ~= CurrentRound then
+      if nowtime < (PersistedStore.MayRound + commandrebuild)  then
         if maycommand:IsAlive() == true then
           SCHEDULER:New(nil,function() maycommand:Destroy()
-          BASE:E({self.name,"Maycommand was reported as 0 current round and Mayround don't match destroying",PersistedStore.MayRound,PersistedStore.MayCommand})
+          BASE:E({self.name,"Maycommand was reported as 0 current time less then rebuild destroying",PersistedStore.MayRound,PersistedStore.MayCommand})
+          local rbt = os.date('%A, %B %d %Y at %H:%M UTC', (PersistedStore.MayRound))
+          _mac:RemoveMark(_mam)
+          _mam = _mac:MarkToAll("Maykop Command Center, Destroyed rebuild after ".. rbt,true)
           end,{},15)
         end
       else
@@ -2877,10 +2891,13 @@ function RIB:RInsurgents()
   BASE:E({self.name,"Command Center Kraz"})
   if PersistedStore.KrazCommand ~= nil then
     if PersistedStore.KrazCommand == 0 then
-      if PersistedStore.KrazRound ~= CurrentRound then
+      if nowtime < (PersistedStore.KrazRound + commandrebuild)  then
         if krazcommand:IsAlive() == true then
           SCHEDULER:New(nil,function() krazcommand:Destroy()
-          BASE:E({self.name,"Krazcommand was reported as 0 current round and Krazround don't match destroying",PersistedStore.KrazRound,PersistedStore.KrazCommand})
+          local rbt = os.date('%A, %B %d %Y at %H:%M UTC', (PersistedStore.KrazRound))
+          _kc:RemoveMark(_km)
+          _km = _km:MarkToAll("Krasnodar Command Center, Destroyed rebuild after ".. rbt,true)
+          BASE:E({self.name,"Krazcommand was reported as 0 current time is less then rebuild destroying",PersistedStore.KrazRound,PersistedStore.KrazCommand})
           end,{},15)
         end
       else
@@ -2896,10 +2913,13 @@ function RIB:RInsurgents()
   BASE:E({self.name,"Command Center Moz"})
   if PersistedStore.MozCommand ~= nil then
     if PersistedStore.MozCommand == 0 then
-      if PersistedStore.MozRound ~= CurrentRound then
+      if nowtime < (PersistedStore.MozRound + commandrebuild)  then
         if mozcommand:IsAlive() == true then
           SCHEDULER:New(nil,function() mozcommand:Destroy()
-          BASE:E({self.name,"mozcommand was reported as 0 current round and Mozzround don't match destroying",PersistedStore.MozRound,PersistedStore.MozCommand})
+           local rbt = os.date('%A, %B %d %Y at %H:%M UTC', (nowtime + commandrebuild))
+          _mc:RemoveMark(_mm)
+          _mm = _mc:MarkToAll("Mozdok Command Center, Destroyed rebuild after ".. rbt,true)
+          BASE:E({self.name,"mozcommand was reported as 0 current time is less then rebuild destroying",PersistedStore.MozRound,PersistedStore.MozCommand})
           end,{},15)
         end
       else
@@ -3149,6 +3169,11 @@ SCHEDULER:New(nil,function()
 end,{},5)
 
 flipflop = false
+
+function runfactories()
+
+
+end
 SCHEDULER:New(nil,function()
   BASE:E({"Support and Rattack Timer go."})
   mainthread:SpawnSupports()
@@ -3161,6 +3186,16 @@ SCHEDULER:New(nil,function()
   mainthread:Gunships()
   if flipflop == false then
     flipflop = true
+
+  else
+    flipflop = false
+  end
+end, {}, 75,(30*60))
+
+flipflop2 = false
+redairspace = 0
+
+function reinforcesqns()
     BASE:E({"Getting Squadron amounts if any under strength give them 4 new units if factories have made new fighters"})
     if novocommand:IsAlive() == true then
       sqn = "NovoSqn"
@@ -3248,233 +3283,7 @@ SCHEDULER:New(nil,function()
         end
       end
     end
-  else
-    flipflop = false
-    local gfact = 0
-    local nfact = 0
-    local mfact = 0 
-    local kfact = 0
-    local cfact = 0
-    local afact = 0
-    if STATIC:FindByName("DEPOT Factory1") ~= nil then
-      if STATIC:FindByName("DEPOT Factory1"):IsAlive() == true then
-        if redairsupply <= 100 then
-          redairsupply = redairsupply + 0.5
-          gfact = gfact + 1
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory2") ~= nil then
-      if STATIC:FindByName("DEPOT Factory2"):IsAlive() == true then
-        if redairsupply <= 100 then
-          redairsupply = redairsupply + 0.5
-          gfact = gfact + 2
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory3") ~= nil then
-      if STATIC:FindByName("DEPOT Factory3"):IsAlive() == true then
-        if redairsupply <= 100 then
-          redairsupply = redairsupply + 1
-          gfact = gfact + 3
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory4") ~= nil then
-      if STATIC:FindByName("DEPOT Factory4"):IsAlive() == true then
-        if redairsupply <= 100 then
-          redairsupply = redairsupply + 1
-          gfact = gfact + 4
-        end
-      end
-    end
- 
-    if STATIC:FindByName("DEPOT Factory5") ~= nil then
-      if STATIC:FindByName("DEPOT Factory5"):IsAlive() == true then
-        if redgroundsupply <= 200 then
-          redgroundsupply = redgroundsupply + 5
-          nfact = nfact + 1
-        end
-      end
-    end
-    nfact = nfact * 100
-    nfmc:RemoveMark(nfm)
-    nfm = nfmc:MarkToAll("Novorossiysk Factory Output Capacity:" .. nfact)
-    if STATIC:FindByName("DEPOT Factory6") ~= nil then
-      if STATIC:FindByName("DEPOT Factory6"):IsAlive() == true then
-        if redgroundsupply <= 200 then
-          redgroundsupply = redgroundsupply + 5
-          mfact = mfact + 1
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory7") ~= nil then
-      if STATIC:FindByName("DEPOT Factory7"):IsAlive() == true then
-        if redgroundsupply <= 200 then
-          redgroundsupply = redgroundsupply + 5
-          mfact = mfact + 1
-        end
-      end
-    end
-    mfact = (mfact / 2) * 100
-    mfmc:RemoveMark(mfm)
-    mfm = mfmc:MarkToAll("Mayskiy Factory Output Capacity:".. mfact) 
-    if STATIC:FindByName("DEPOT Factory8") ~= nil then
-      if STATIC:FindByName("DEPOT Factory8"):IsAlive() == true then
-        if redgroundsupply <= 200 then
-          redgroundsupply = redgroundsupply + 5
-          afact = afact + 1
-        end
-      else
-        BASE:E({"fact8 returning not alive"})
-      end
-    else
-      BASE:E({"fac 8 returning not nil"})
-    end
-    if STATIC:FindByName("DEPOT Factory9") ~= nil then
-      if STATIC:FindByName("DEPOT Factory9"):IsAlive() == true then
-        if redgroundsupply <= 200 then
-          redgroundsupply = redgroundsupply + 5
-          afact = afact +1
-        
-        end
-      else
-        BASE:E({"fact 9 returning not alive"})
-        
-      end
-    else
-      BASE:E({"fac 9 returning not nil"})
-    end
-    if STATIC:FindByName("DEPOT Factory10") ~= nil then
-      if STATIC:FindByName("DEPOT Factory10"):IsAlive() == true then
-        if redgroundsupply <= 200 then
-          redgroundsupply = redgroundsupply + 5
-          afact = afact+1
-        end
-      else
-        BASE:E({"fact 10 returning not alive"})
-        
-      end
-    else
-        BASE:E({"fact 10 returning not alive"})
-        
-    end 
-    afact = (afact / 3) * 100
-    apsmc:RemoveMark(apsm)
-    apsm = apsmc:MarkToAll("Apsheronsk Factory Output Capacity:".. afact,true)
-    if STATIC:FindByName("DEPOT Factory11") ~= nil then
-      if STATIC:FindByName("DEPOT Factory11"):IsAlive() == true then
-        if redairsupply <= 100 then
-          redairsupply = redairsupply + 0.5
-          cfact = cfact + 1
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory12") ~= nil then
-      if STATIC:FindByName("DEPOT Factory12"):IsAlive() == true then
-        if redairsupply <= 100 then
-          redairsupply = redairsupply + 0.5
-          cfact = cfact + 1
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory13") ~= nil then
-      if STATIC:FindByName("DEPOT Factory13"):IsAlive() == true then
-        if redairsupply <= 100 then
-          redairsupply = redairsupply + 0.5
-          cfact = cfact + 1
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory14") ~= nil then
-      if STATIC:FindByName("DEPOT Factory14"):IsAlive() == true then
-        if redairsupply <= 100 then
-          redairsupply = redairsupply + 1
-          cfact = cfact + 1
-        end
-      end
-    end
-    cfact = (cfact / 4) * 100 
-    cfmc:RemoveMark(cfm)
-    cfm = cfmc:MarkToAll("Cherkessk Factory Output Capacity:" .. cfact,true)
-    if STATIC:FindByName("DEPOT Factory15") ~= nil then
-      if STATIC:FindByName("DEPOT Factory15"):IsAlive() == true then
-        if redairsupply <= 100 then
-          redairsupply = redairsupply + 1
-          gfact = gfact + 1
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory16") ~= nil then
-      if STATIC:FindByName("DEPOT Factory16"):IsAlive() == true then
-        if redgroundsupply <= 200 then
-          redgroundsupply = redgroundsupply + 5
-          kfact = kfact + 1
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory17") ~= nil then
-      if STATIC:FindByName("DEPOT Factory17"):IsAlive() == true then
-        if redgroundsupply <= 200 then
-          redgroundsupply = redgroundsupply + 5
-          kfact = kfact + 1
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory18") ~= nil then
-      if STATIC:FindByName("DEPOT Factory18"):IsAlive() == true then
-        if redgroundsupply <= 200 then
-          redgroundsupply = redgroundsupply + 5
-          kfact = kfact + 1
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory19") ~= nil then
-      if STATIC:FindByName("DEPOT Factory19"):IsAlive() == true then
-        if redgroundsupply <= 200 then
-          redgroundsupply = redgroundsupply + 5
-          kfact = kfact + 1
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory20") ~= nil then
-      if STATIC:FindByName("DEPOT Factory20"):IsAlive() == true then
-        if redgroundsupply <= 200 then
-          redgroundsupply = redgroundsupply + 5
-          kfact = kfact + 1
-        end
-      end
-    end
-    kfact = (kfact /5) * 100 
-    kfmc:RemoveMark(kfm)
-    kfm = kfmc:MarkToAll("Krasnador Factory Output Capacity:".. kfact,true)
-    
-    
-    if STATIC:FindByName("DEPOT Factory21") ~= nil then
-      if STATIC:FindByName("DEPOT Factory21"):IsAlive() == true then
-        if redairsupply <= 100 then
-          redairsupply = redairsupply + 1
-          redgroundsupply = redgroundsupply + 5
-        end
-      end
-    end
-    if STATIC:FindByName("DEPOT Factory22") ~= nil then
-      if STATIC:FindByName("DEPOT Factory15"):IsAlive() == true then
-        if redairsupply <= 100 then
-          redairsupply = redairsupply + 1
-          redgroundsupply = redgroundsupply + 5
-        end
-      end
-    end
-    gfact = (gfact / 5 * 100)
-    gfmc:RemoveMark(gfm)
-    gfm = gfmc:MarkToAll("Gelendzhik Factory Output Capacity:" .. gfact)
-  end
-end, {}, 75,(30*60))
-
-flipflop2 = false
-redairspace = 0
-
+end
 function checkthings()
     BASE:E("Checking Command Groups")
   if novocommand:IsAlive() ~= true then
@@ -3484,13 +3293,14 @@ function checkthings()
       MESSAGE:New("Novorossiysk command has ceased to transmit, squadron is no longer active",15):ToAll()
       ra2adisp:SetSquadron("NovoSqn",AIRBASE.Caucasus.Novorossiysk,RCAPTEMPLATES,0)
       do
-        _nc:RemoveMark(_nm)
-        _nm = _nc:MarkToAll("Novorossisk Command Center, Destroyed",true)
         if PersistedStore.NovoCommand == 1 then
           PersistedStore.NovoCommand = 0
-          PersistedStore.NovoRound = CurrentRound
+          PersistedStore.NovoRound = nowtime
+          local rbt = os.date('%A, %B %d %Y at %H:%M UTC', (nowtime + commandrebuild))
+          _nc:RemoveMark(_nm)
+          _nm = _nc:MarkToAll("Novorossisk Command Center, Destroyed rebuild after ".. rbt,true)
         else
-          BASE:E({"NovoCommand was reporting dead already not updating info."})
+          BASE:E({"NovoCommand was dead already not updating info."})
         end
       end
     --mainthread.novosqn:SpawnScheduleStop()
@@ -3506,11 +3316,12 @@ function checkthings()
       MESSAGE:New("Maykop command has ceased to transmit, squadrons are no longer active",15):ToAll()
       ra2adisp:SetSquadron("MaySqn",AIRBASE.Caucasus.Maykop_Khanskaya,RCAPTEMPLATES,0)
       do
-        _mac:RemoveMark(_mam)
-        _mam = _mac:MarkToAll("Maykop Command Center, Destroyed",true)
         if PersistedStore.MayCommand == 1 then
           PersistedStore.MayCommand = 0
-          PersistedStore.MayRound = CurrentRound
+          PersistedStore.MayRound = nowtime
+          local rbt = os.date('%A, %B %d %Y at %H:%M UTC', (nowtime + commandrebuild))
+          _mac:RemoveMark(_mam)
+          _mam = _mac:MarkToAll("Maykop Command Center, Destroyed rebuild after ".. rbt,true)
         else
           BASE:E({"MayCommand was reporting dead already not updating info."})
         end
@@ -3529,12 +3340,13 @@ function checkthings()
       MESSAGE:New("Mozdok command has ceased to transmit, squadrons are no longer active",15):ToAll()
       ra2adisp:SetSquadron("MozSqn",AIRBASE.Caucasus.Mozdok,RCAPTEMPLATES,0)
       do
-        _mc:RemoveMark(_mm)
-        _mm = _mc:MarkToAll("Mozdok Command Center, Destroyed",true)
         if PersistedStore.MozCommand == 1 then
           BASE:E({"Moz Command was not dead in persistence updating"})
           PersistedStore.MozCommand = 0
-          PersistedStore.MozRound = CurrentRound
+          PersistedStore.MozRound = nowtime
+          local rbt = os.date('%A, %B %d %Y at %H:%M UTC', (nowtime + commandrebuild))
+          _mc:RemoveMark(_mm)
+          _mm = _mc:MarkToAll("Mozdok Command Center, Destroyed rebuild after ".. rbt,true)
         else
           BASE:E({"MozCommand was reporting dead already not updating info."})
         end
@@ -3555,10 +3367,11 @@ function checkthings()
       MESSAGE:New("Krasnodar Center command has ceased to transmit, squadrons are no longer active",15):ToAll()
       do
         if PersistedStore.KrazCommand == 1 then
-          _kc:RemoveMark(_km)
-          _km = _km:MarkToAll("Krasnodar Command Center, Destroyed",true)
           PersistedStore.KrazCommand = 0
-          PersistedStore.KrazRound = CurrentRound
+          PersistedStore.KrazRound = nowtime
+           local rbt = os.date('%A, %B %d %Y at %H:%M UTC', (nowtime + commandrebuild))
+          _kc:RemoveMark(_km)
+          _km = _km:MarkToAll("Krasnodar Command Center, Destroyed rebuild after ".. rbt,true)
         else
           BASE:E({"KrasCommand was reporting dead already not updating info."})
         end
@@ -4893,27 +4706,37 @@ local function permanentPlayerCheck()
       
       local PlayerID = PlayerClient.ObjectName
       -- MESSAGE:New("Welcome to Red Iberia Version: "..version.." \n Last updated:".. lastupdate .." \n No Red on Red is Allowed \n Your current objective is to ".. redobject .."\n" ..rcomms .. "\n Remember Stores and Aircraft are limited and take time to resupply",60):ToClient(PlayerClient)
-      PlayerClient:AddBriefing("Welcome to Red Iberia By Rob Graham Version: "..version.." \n Last updated:".. lastupdate .." \n POWERED BY MOOSE \n Current Server time is: ".. nowHour .. ":" .. nowminute .."\n Mission Restart Time: restart time:".. restarttime .. "\n No Red on Red is Allowed \n Your current objective is to ".. redobject .."\n" ..rcomms .. "\n Remember Stores and Aircraft are limited and take time to resupply")
+      -- PlayerClient:AddBriefing("Welcome to Red Iberia By Rob Graham Version: "..version.." \n Last updated:".. lastupdate .." \n POWERED BY MOOSE \n Current Server time is: ".. nowHour .. ":" .. nowminute .."\n Mission Restart Time: restart time:".. restarttime .. "\n No Red on Red is Allowed \n Your current objective is to ".. redobject .."\n" ..rcomms .. "\n Remember Stores and Aircraft are limited and take time to resupply")
       if PlayerClient:GetGroup() ~= nil then
           local group = PlayerClient:GetGroup()
       end
       if PlayerClient:IsAlive() then
-                PlayerRMap[PlayerID] = true
-         else
-                PlayerRMap[PlayerID] = false
-         end
+        if PlayerRMap[PlayerID] ~= true then
+          PlayerRMap[PlayerID] = true
+          MESSAGE:New("Welcome to Red Iberia By Rob Graham Version: "..version.." \n Last updated:".. lastupdate .." \n POWERED BY MOOSE \n Current Server time is: ".. nowHour .. ":" .. nowminute .."\n Mission Restart Time: restart time:".. restarttime .. "\n No Red on Red is Allowed \n Your current objective is to ".. redobject .."\n" ..rcomms .. "\n Remember Stores and Aircraft are limited and take time to resupply",60):ToClient(PlayerClient)
+        end
+      else
+        if PlayerRMap[PlayerID] ~= false then
+          PlayerRMap[PlayerID] = false
+        end
+      end
     end)
     SetPlayerBlue:ForEachClient(function(PlayerClient) 
       local PlayerID = PlayerClient.ObjectName
-        PlayerClient:AddBriefing("Welcome to Red Iberia Rob Graham Version: "..version.." \n Last updated:".. lastupdate .." \n POWERED BY MOOSE \n Current Server time is: ".. nowHour .. ":" .. nowminute .."\n Mission Restart time:".. restarttime .. "\n No Blue on Blue is Allowed \n Your current objective is to ".. blueobject .."\n" ..bcomms .. "\n Remember Stores and Aircraft are limited and take time to resupply")
+        --PlayerClient:AddBriefing("Welcome to Red Iberia Rob Graham Version: "..version.." \n Last updated:".. lastupdate .." \n POWERED BY MOOSE \n Current Server time is: ".. nowHour .. ":" .. nowminute .."\n Mission Restart time:".. restarttime .. "\n No Blue on Blue is Allowed \n Your current objective is to ".. blueobject .."\n" ..bcomms .. "\n Remember Stores and Aircraft are limited and take time to resupply")
         if PlayerClient:GetGroup() ~= nil then
           local group = PlayerClient:GetGroup()
         end
          if PlayerClient:IsAlive() then
+           if PlayerBMap[PlayerID] ~= true then
                 PlayerBMap[PlayerID] = true
+                MESSAGE:New("Welcome to Red Iberia Rob Graham Version: "..version.." \n Last updated:".. lastupdate .." \n POWERED BY MOOSE \n Current Server time is: ".. nowHour .. ":" .. nowminute .."\n Mission Restart time:".. restarttime .. "\n No Blue on Blue is Allowed \n Your current objective is to ".. blueobject .."\n" ..bcomms .. "\n Remember Stores and Aircraft are limited and take time to resupply",60):ToClient(PlayerClient)
+           end    
          else
+          if PlayerBMap[PlayerID] ~= false then
                 PlayerBMap[PlayerID] = false
-         end
+          end
+       end
     end)
    currentclient = 0
    local cc = SET_CLIENT:New():FilterCoalitions("red"):FilterActive():FilterOnce()
@@ -4964,7 +4787,7 @@ local function roundcounter()
     BCC:MessageToAll("Mission WILL RESTART IN 30 Seconds")
   end,{}, (60*9.5))
 end
-
+do 
 local function starttimer()
   local currentTime = os.time()
   local cooldown = currentTime - round_Timer
@@ -4993,7 +4816,7 @@ SCHEDULER:New(nil,function()
 SCHEDULER:New(nil,function() 
     BCC:MessageToAll("Mission WILL RESTART IN 30 Minutes")
   end,{}, (60*60)*5.5) 
-  
+end
 BASE:E("SETTING UP TASKING MISSIONS")
 reda2gmission = MISSION:New(RCC,"RED HAMMER","PRIMARY","Destroy the Western Forces so we can retake what is ours",coalition.side.RED)
 bluea2gmission = MISSION:New(BCC,"IRON HAND","PRIMARY","Destroy Russian Forces",coalition.side.BLUE)
@@ -5012,17 +4835,7 @@ do
 lasthour = nil
 
 SCHEDULER:New(nil,function()  
-  do
-  nowTable = os.date('*t')
-  nowYear = nowTable.year
-  nowMonth = nowTable.month
-  nowDay = nowTable.day
-  nowHour = nowTable.hour
-  nowminute = nowTable.min
-  nowDaylightsavings = nowTable.isdst
-  nowDayofYear = nowTable.yday
-  nowDayofWeek = nowTable.wday
-end
+
 
   BASE:E({"Current Local time is:",nowYear,nowMonth,nowDay,nowHour,nowminute})
   if lasthour == nil then
@@ -5068,21 +4881,306 @@ end
     end
   end
  end,{},1,60)
+
+function fAlive(grp)
+if grp:IsAlive() then return true else return false end
+end
+function factory()
+    AllStatics = SET_STATIC:New():FilterPrefixes({"DEPOT"}):FilterOnce()
+    gfact = 0
+    nfact = 0
+    mfact = 0 
+    kfact = 0
+    cfact = 0
+    afact = 0
+    AllStatics:ForEach(function (grp)
+    if  grp:GetName() == "DEPOT Factory1" then
+      local prod = math.random(1,5)
+      prod = prod / 10
+      BASE:E({"PRODUCTION FOR FACTORY1 is:",prod})
+      if fAlive(grp) == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + prod
+        end
+        gfact = gfact + prod
+      end
+    elseif grp:GetName() == "DEPOT Factory2" then
+      local prod = math.random(1,5)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + prod
+        end
+      gfact = gfact + prod
+      end
+    elseif grp:GetName() == "DEPOT Factory3" then
+      local prod = math.random(1,5)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + prod
+        end
+      gfact = gfact + prod
+      end
+    elseif grp:GetName() == "DEPOT Factory4" then
+      local prod = matlocal prod = math.random(1,5)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + prod
+        end
+      gfact = gfact + prod
+      end
+    elseif grp:GetName() == "DEPOT Factory5" then
+    local prod = math.random(5,50)
+    prod = prod / 10
+      if fAlive(grp) == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + prod
+        end
+      nfact = nfact + prod
+      end
+    elseif grp:GetName() == "DEPOT Factory6" then
+    local prod = math.random(5,50)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + prod
+        end
+      mfact = mfact + prod
+      end
+    elseif grp:GetName() == "DEPOT Factory6" then
+    local prod = math.random(5,50)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + prod
+        end
+      mfact = mfact + prod
+      end
+    elseif grp:GetName() == "DEPOT Factory7" then
+    local prod = math.random(5,50)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + prod
+        end
+      mfact = mfact + prod
+      end
+    elseif grp:GetName() == "DEPOT Factory8" then
+    local prod = math.random(5,50)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + prod
+        end
+      afact = afact + prod
+      end    
+    elseif grp:GetName() == "DEPOT Factory9" then
+    local prod = math.random(5,50)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + prod
+        end
+      afact = afact + prod
+      end    
+    elseif grp:GetName() == "DEPOT Factory10" then
+    local prod = math.random(5,50)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + prod
+        end
+      afact = afact + prod
+      end  
+    elseif grp:GetName() == "DEPOT Factory11" then
+      local prod = math.random(1,5)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + prod
+        end
+      cfact = cfact + prod
+      end
+    elseif grp:GetName() == "DEPOT Factory12" then
+      local prod = math.random(1,5)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + prod
+        end
+      cfact = cfact + prod
+      end 
+    elseif grp:GetName() == "DEPOT Factory13" then
+      local prod = math.random(1,5)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + prod
+        end
+      cfact = cfact + prod
+      end       
+    
+    elseif grp:GetName() == "DEPOT Factory14" then
+      local prod = math.random(1,5)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + prod
+        end
+      cfact = cfact + prod
+      end
+    elseif grp:GetName() == "DEPOT Factory15" then
+      local prod = math.random(1,5)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redairsupply <= 100 then
+          redairsupply = redairsupply + prod
+        end
+      gfact = gfact + prod
+      end
+    elseif grp:GetName() == "DEPOT Factory16" then
+    local prod = math.random(5,50)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + prod
+        end
+      kfact = kfact + prod
+      end  
+    elseif grp:GetName() == "DEPOT Factory17" then
+    local prod = math.random(5,50)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + prod
+        end
+      kfact = kfact + prod
+      end  
+      elseif grp:GetName() == "DEPOT Factory18" then
+    local prod = math.random(5,50)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + prod
+        end
+      kfact = kfact + prod
+      end  
+    elseif grp:GetName() == "DEPOT Factory19" then
+    local prod = math.random(5,50)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + prod
+        end
+      kfact = kfact + prod
+      end  
+    elseif grp:GetName() == "DEPOT Factory20" then
+    local prod = math.random(5,50)
+      prod = prod / 10
+      if fAlive(grp) == true then
+        if redgroundsupply <= 200 then
+          redgroundsupply = redgroundsupply + prod
+        end
+      kfact = kfact + prod
+      end  
+    elseif grp:GetName() == "DEPOT Factory21" then
+      if fAlive(grp) == true then
+          redgroundsupply = redgroundsupply + 5
+      end  
+    elseif grp:GetName() == "DEPOT Factory22" then
+      if fAlive(grp) == true then
+        redairsupply = redairsupply + 0.5
+      end  
+    end
+     end)
+     
+    local nfac = (factorytime/60)
+    nfmc:RemoveMark(nfm)
+    nfm = nfmc:MarkToAll("Novorossiysk Factory Output Capacity:" .. nfact .. " Aircraft every ".. nfac .. " Minutes",true)
+    mfmc:RemoveMark(mfm)
+    mfm = mfmc:MarkToAll("Mayskiy Factory Output Capacity:".. mfact .. " Vehicles every ".. nfac .. " Minutes",true)
+    apsmc:RemoveMark(apsm)
+    apsm = apsmc:MarkToAll("Apsheronsk Factory Output Capacity:".. afact.. " Vehicles every ".. nfac .. " Minutes",true)
+    cfmc:RemoveMark(cfm)
+    cfm = cfmc:MarkToAll("Cherkessk Factory Output Capacity:" .. cfact .. " Aircraft every ".. nfac .. " Minutes",true)
+    kfmc:RemoveMark(kfm)
+    kfm = kfmc:MarkToAll("Krasnador Factory Output Capacity:".. kfact .. " Vehicles every ".. nfac .. " Minutes",true)
+    gfmc:RemoveMark(gfm)
+    gfm = gfmc:MarkToAll("Gelendzhik Factory Output Capacity:" .. gfact .. " Aircraft every ".. nfac .. " Minutes",true)
+end
+
+
+
  
- --[[ SCHEDULER:New(nil,function() 
- BASE:E({"completeAASystems",ctld.completeAASystems})
- BASE:E({"cratesinzone",ctld.cratesInZone})
- BASE:E({"extractzones",ctld.extractZones})
- BASE:E({"ctld.droppedTroopsRED",ctld.droppedTroopsRED})
- BASE:E({"ctld.droppedTroopsBLUE",ctld.droppedTroopsBLUE})
- BASE:E({"ctld.droppedVehiclesRED",ctld.droppedVehiclesRED})
- BASE:E({"ctld.droppedVehiclesBLUE",ctld.droppedVehiclesBLUE})
- BASE:E({"ctld.pickupzones",ctld.pickupZone})
- BASE:E({"ctld.jtacunits",ctld.jtacUnits})
- BASE:E({"ctld.jtacRadioAdded",ctld.jtacRadioAdded})
- BASE:E({"ctld.addedTo",ctld.addedTo})
- BASE:E({"ctld.builtFOBS",ctld.builtFOBS})
- BASE:E({"ctld.callbacks",ctld.callbacks})
-   end,{},1,5) ]]
+ -- these are just incase, and reinforce last set 30 minutes behind because we want it there
+ if PersistedStore.FactoryLast == nil then
+  PersistedStore.FactoryLast = 0
+  BASE:E("PersistedStore.FactoryLast was nil!")
+ end
+ if PersistedStore.ReinforceLast == nil then
+  PersistedStore.ReinforceLast = (os.time() - (30 * 60))
+  BASE:E("PersistedStore.ReinforceLast was nil!")
+ elseif PersistedStore.ReinforceLast == 0 then
+  PersistedStore.ReinforceLast = (os.time() - (30 * 60))
+ end
+
+function checkcommandrebuild()
+   if nowtime > (PersistedStore.KrazRound)  then
+      if krazcommand:IsAlive() ~= true then
+         krazcommand = SPAWN:New("Krascommand")
+         _kc:RemoveMark(_km)
+         _km = _kc:MarkToAll("Krasnodar Command Center, Active",true)
+         PersistedStore.KrazCommand = 1
+     end
+   end
+   if nowtime > (PersistedStore.NovoRound) then
+      if novocommand:IsAlive() ~= true then
+        novocommand = SPAWN:New("Novocommand") 
+        _nc:RemoveMark(_nm)
+        _nm = _kc:MarkToAll("Novorossysk Command Center, Active",true)
+        PersistedStore.NovoCommand = 1
+      end
+   end
+ end
+ 
+ -- heartbeat 1 second timer
+ SCHEDULER:New(nil,function()
+  -- get our times and update them
+  do
+    nowtime = os.time()
+    nowTable = os.date('*t')
+    nowYear = nowTable.year
+    nowMonth = nowTable.month
+    nowDay = nowTable.day
+    nowHour = nowTable.hour
+    nowminute = nowTable.min
+    nowDaylightsavings = nowTable.isdst
+    nowDayofYear = nowTable.yday
+    nowDayofWeek = nowTable.wday
+    nowsecond = nowTable.sec
+  end 
+
+    -- ok take the now time if it's greater then our factory last + the factorytime then run
+    if init == true then
+       if pstatic == true then
+          if nowtime > (PersistedStore.FactoryLast + factorytime) then
+            BASE:E("Running Factory as FactoryLast + factorytime was < nowtime")
+            factory()
+            PersistedStore.FactoryLast = nowtime
+            local nextrun = PersistedStore.FactoryLast + factorytime 
+            BASE:E({"Next Factory Run should be at ",os.date('%A, %B %d %Y at %I:%M:%S %p',nextrun)})        
+        end
+      if nowtime > (PersistedStore.ReinforceLast + reinforcehours) then
+        BASE:E({"Running Reinforce Sqns as ready to run"})
+        reinforcesqns()
+        PersistedStore.ReinforceLast = nowtime
+        local nextrun = PersistedStore.ReinforceLast + reinforcehours 
+        BASE:E({"Next Factory Run should be at ",os.date('%A, %B %d %Y at %I:%M:%S %p',nextrun)})      
+      end
+    end
+    end
+   end,{},0,1)
 
 end

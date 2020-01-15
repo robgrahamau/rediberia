@@ -29,7 +29,7 @@
 local SaveScheduleStatics=60 --how many seconds between each check of all the statics.
 local savefilename = "staticsave.lua"
 local savefile = lfs.writedir() .."rib\\" .. savefilename
-AllStatics = SET_STATIC:New():FilterPrefixes({"DEPOT","CTLD","ctld"}):FilterStart()
+AllStatics = SET_STATIC:New():FilterPrefixes({"DEPOT"}):FilterStart()
  -----------------------------------
  --Do not edit below here
  -----------------------------------
@@ -128,8 +128,10 @@ if file_exists(savefile) then
     rngsmokes(coord)
   end
   end)
+  pstatic = true
 else --Save File does not exist we start a fresh table
   SaveStatics={}
+  pstatic = true
 end
 
 --THE SAVING SCHEDULE

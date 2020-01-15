@@ -1253,7 +1253,7 @@ function ctld.spawnCrateStatic(_country, _unitId, _point, _name, _weight,_side)
 
     if ctld.staticBugWorkaround and ctld.slingLoad == false then
         local _groupId = ctld.getNextGroupId()
-        local _groupName = "Crate Group #".._groupId
+        local _groupName = "ctld Crate Group #".._groupId
 
         local _group = {
             ["visible"] = false,
