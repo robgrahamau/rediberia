@@ -4368,7 +4368,7 @@ local function handleSpawnRequest(text,coord)
    else
     mainthread.BluArmyState1 = 5
    end
-   mainthread.BluArmy1 = mainthread.BluArmySpawn1:SpawnFromCoordinate(coord)
+   mainthread.BluArmy1 = mainthread.BluArmy1Spawn:SpawnFromCoordinate(coord)
    mainthread.BlueArmy1Spawned = mainthread.BluArmy1
   elseif text:find("blue3") then
    mainthread.BluArmy2:Destroy()
@@ -4379,7 +4379,7 @@ local function handleSpawnRequest(text,coord)
    else
     mainthread.BluArmyState2 = 5
    end
-   mainthread.BluArmy2 = mainthread.BluArmySpawn2:SpawnFromCoordinate(coord)
+   mainthread.BluArmy2 = mainthread.BluArmy2Spawn:SpawnFromCoordinate(coord)
    mainthread.BlueArmy2 = mainthread.BluArmy2
   end
 end  
@@ -4998,7 +4998,7 @@ BASE:E("SETTING UP TASKING MISSIONS")
 reda2gmission = MISSION:New(RCC,"RED HAMMER","PRIMARY","Destroy the Western Forces so we can retake what is ours",coalition.side.RED)
 bluea2gmission = MISSION:New(BCC,"IRON HAND","PRIMARY","Destroy Russian Forces",coalition.side.BLUE)
 rreeceset = SET_GROUP:New():FilterPrefixes({"Russian Army","RAFD"}):FilterCoalitions("red"):FilterActive():FilterStart()
-rattackset = SET_GROUP:New():FilterPrefixes({"RUS","USAFA"}):FilterActive():FilterStart()
+rattackset = SET_GROUP:New():FilterCoalitions("red"):FilterActive():FilterStart()
 rdetectionareas = DETECTION_AREAS:New(rreeceset,3000)
 rTaskDispatcher = TASK_A2G_DISPATCHER:New(reda2gmission,rattackset,rdetectionareas)
 brecceset = SET_GROUP:New():FilterPrefixes({"AFAC","BAF","US Army","Apaches","Overlord"}):FilterCoalitions("blue"):FilterActive():FilterStart()
