@@ -152,8 +152,8 @@ SaveStatics[grp:GetName()] =
  -- ["rate"] = 100,
   ["name"] = grp:GetName(),
   --["category"] = "Fortifications",
-  ["y"] = grp:GetVec2().y, 
-  ["x"] = grp:GetVec2().x, 
+  --["y"] = grp:GetVec2().y, 
+  --["x"] = grp:GetVec2().x, 
   ["dead"] = Alive(grp),
   ["Country"] = grp:GetCountry()
 }
