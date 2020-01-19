@@ -1,5 +1,5 @@
-version = "2.2.9"
-lastupdate = "15-JAN-2020 2000AUEDST"
+version = "2.2.10"
+lastupdate = "17-JAN-2020 2000AUEDST"
 
 env.info("----------------------------------------------------------")
 env.info("--------------RED IBERIA VERSION ".. version .."----------------------")
@@ -50,7 +50,7 @@ trigger.action.setUserFlag("SSB",100)
 function randomform()
   local rndnum = math.random(1,7)
   BASE:E({"Random Form number is",rndnum})
-  if rndnum == 1 then
+  --[[if rndnum == 1 then
     return "Off road"
   elseif rndnum == 2 then
     return "Line abreast"
@@ -65,8 +65,9 @@ function randomform()
   elseif rndnum == 7 then
     return "Echelon Right"
   else
-    return "Vee"   
-  end
+    return "Off Road"   
+  end]]
+  return "Off Road" -- try and fix the @$@ routing issues of late.
 end
 SupportHandler = EVENTHANDLER:New()
 
@@ -1374,6 +1375,11 @@ do
   rpos1 = nil
   -- check if our red army is alive if it is we set all the values to say so and store its position
   -- otherwise we say it's dead! and order a respawn
+  if self.RedArmy == nil then
+    self.RedArmy = self.RedArmySpawn:Spawn()
+    self.RedArmySpawned = self.RedArmy 
+    BASE:E({self.name,"Red Army was NIL! this shouldn't be"})
+  end
   if self.RedArmy:IsAlive() == true then
     BASE:E({self.name,"Red Army Alive Storing Coord"})
     ralive = true
@@ -1404,6 +1410,11 @@ do
   end
   -- do the above but for the second army.. really we could move this into it's own little 
   -- state machine again but we can't be bothered.
+  if self.RedArmy1 == nil then
+    self.RedArmy1 = self.RedArmySpawn1:Spawn()
+    self.RedArmy1Spawned = self.RedArmy1
+    BASE:E({self.name,"Red Army1 was NIL! this shouldn't be"})
+  end
   if self.RedArmy1:IsAlive() == true then
     BASE:E({self.name,"Red Army 2 Alive Storing Coord"})
     ralive1 = true
@@ -1678,8 +1689,10 @@ do
  
   function RIB:spawnGround(unit,x,y,state)
   if unit == "blue1" then
-    if self.BluArmy:IsAlive() == true then
-      self.BluArmy:Destroy()
+    if self.BluArmy ~= nil then
+      if self.BluArmy:IsAlive() == true then
+        self.BluArmy:Destroy()
+      end
     end
     self.BluArmyX = x
     self.BluArmyY = y
@@ -1689,8 +1702,10 @@ do
     self.BluArmy = self.BluArmySpawn:SpawnFromPointVec2(tempvec2)
     self.BlueArmySpawned = self.BluArmy
   elseif unit == "blue2" then
-    if self.BluArmy1:IsAlive() == true then
-      self.BluArmy1:Destroy()
+    if self.BluArmy1 ~= nil then
+      if self.BluArmy1:IsAlive() == true then
+        self.BluArmy1:Destroy()
+      end
     end
     self.BluArmyX1 = x
     self.BluArmyY1 = y
@@ -1700,8 +1715,10 @@ do
     self.BluArmy1 = self.BluArmy1Spawn:SpawnFromPointVec2(tempvec2)
     self.BlueArmy1Spawned = self.BluArmy1
   elseif unit == "blue3" then
-    if self.BluArmy2:IsAlive() == true then
-      self.BluArmy2:Destroy()
+    if self.BluArmy2 ~= nil then   
+      if self.BluArmy2:IsAlive() == true then
+        self.BluArmy2:Destroy()
+      end
     end
     self.BluArmyX2 = x
     self.BluArmyY2 = y
@@ -1711,8 +1728,10 @@ do
     self.BlueArmy2Spawned = self.BluArmy2
     self.BluArmyStateL2 = 5
   elseif unit == "red1" then
-    if self.RedArmy:IsAlive() == true then
-      self.RedArmy:Destroy()
+    if self.RedArmy ~= nil then
+      if self.RedArmy:IsAlive() == true then
+        self.RedArmy:Destroy()
+      end
     end
     self.RedArmyX = x
     self.RedArmyY = y
@@ -1722,8 +1741,10 @@ do
     self.RedArmySpawned = self.RedArmy
     self.RedArmyStateL = 5
   elseif unit == "red2" then
-    if self.RedArmy1:IsAlive() == true then
-      self.RedArmy1:Destroy()
+    if self.RedArmy1 ~= nil then
+      if self.RedArmy1:IsAlive() == true then
+        self.RedArmy1:Destroy()
+      end
     end
      self.RedArmyX1 = x
      self.RedArmyY2 = y
@@ -1746,6 +1767,11 @@ do
   balive1 = false
   balive2 = false
   -- Check if blue army is alive or dead
+  if self.BluArmy == nil then
+    BASE:E({self.name,"Blue Army was NIL! this shouldn't be"})
+    self.BluArmy = self.BluArmySpawn:Spawn()
+    self.BluArmySpawned = self.BluArmy
+  end
   if self.BluArmy:IsAlive() == true then
     balive = true
     BASE:E({self.name,"Blue Army Alive storing Coord"})
@@ -1763,6 +1789,11 @@ do
     self.BluArmyY = 0
     self.BluArmyState = 1
   end
+    if self.BluArmy1 == nil then
+    BASE:E({self.name,"Blue Army2 was NIL! this shouldn't be"})
+    self.BluArmy1 = self.BluArmy1Spawn:Spawn()
+    self.BluArmy1Spawned = self.BluArmy
+  end
   if self.BluArmy1:IsAlive() == true then
     balive1 = true
     BASE:E({self.name,"Blue 1 Army alive storing data"})
@@ -1779,6 +1810,11 @@ do
     self.BluArmyY1 = 0
     self.BluArmyState1 = 4
     self.BlueArmy1Spawned = self.BluArmy1
+  end
+  if self.BluArmy2 == nil then
+    BASE:E({self.name,"Blue Army2 was NIL! this shouldn't be"})
+    self.BluArmy2 = self.BluArmy2Spawn:Spawn()
+    self.BluArmy2Spawned = self.BluArmy
   end
   if self.BluArmy2:IsAlive() == true then
     balive2 = true
@@ -4140,9 +4176,12 @@ local function handleSpawnRequest(text,coord)
     end
   end
   if text:find("red1") then
-   mainthread.RedArmy:Destroy()
-   mainthread.RedArmyX = coord.x
-   mainthread.RedArmyY = coord.y
+    if mainthread.RedArmy ~= nil then
+      mainthread.RedArmy:Destroy()
+    end
+      mainthread.RedArmyX = coord.x
+      mainthread.RedArmyY = coord.y
+    
    if statem > -1 and statem < 6 then
     mainthread.RedArmyState = statem
    else
@@ -4151,8 +4190,10 @@ local function handleSpawnRequest(text,coord)
    mainthread.RedArmy = mainthread.RedArmySpawn:SpawnFromCoordinate(coord)
    mainthread.RedArmySpawned = mainthread.RedArmy
   elseif text:find("red2") then
-   mainthread.RedArmy1:Destroy()
-   mainthread.RedArmyX1 = coord.x
+   if mainthread.RedArmy1 ~= nil then
+    mainthread.RedArmy1:Destroy()
+   end
+    mainthread.RedArmyX1 = coord.x
    mainthread.RedArmyY1 = coord.y
    if statem > -1 and statem < 6 then
     mainthread.RedArmyState1 = statem
@@ -4162,7 +4203,9 @@ local function handleSpawnRequest(text,coord)
    mainthread.RedArmy1 = mainthread.RedArmySpawn1:SpawnFromCoordinate(coord)
    mainthread.RedArmy1Spawned = mainthread.RedArmy1
   elseif text:find("blue1") then
-   mainthread.BluArmy:Destroy()
+    if mainthread.BluArmy ~= nil then
+      mainthread.BluArmy:Destroy()
+    end
    mainthread.BluArmyX = coord.x
    mainthread.BluArmyY = coord.y
    if statem > -1 and statem < 6 then
@@ -4173,7 +4216,9 @@ local function handleSpawnRequest(text,coord)
    mainthread.BluArmy = mainthread.BluArmySpawn:SpawnFromCoordinate(coord)
    mainthread.BlueArmySpawned = mainthread.BluArmy
   elseif text:find("blue2") then
-   mainthread.BluArmy1:Destroy()
+   if mainthread.BluArmy1 ~= nil then
+    mainthread.BluArmy1:Destroy()
+   end
    mainthread.BluArmyX1 = coord.x
    mainthread.BluArmyY1 = coord.y
    if statem > -1 and statem < 6 then
@@ -4184,7 +4229,9 @@ local function handleSpawnRequest(text,coord)
    mainthread.BluArmy1 = mainthread.BluArmy1Spawn:SpawnFromCoordinate(coord)
    mainthread.BlueArmy1Spawned = mainthread.BluArmy1
   elseif text:find("blue3") then
-   mainthread.BluArmy2:Destroy()
+   if mainthread.BluArmy2 ~= nil then
+    mainthread.BluArmy2:Destroy()
+   end
    mainthread.BluArmyX2 = coord.x
    mainthread.BluArmyY2 = coord.y
    if statem > -1 and statem < 6 then
@@ -4821,7 +4868,7 @@ BASE:E("SETTING UP TASKING MISSIONS")
 reda2gmission = MISSION:New(RCC,"RED HAMMER","PRIMARY","Destroy the Western Forces so we can retake what is ours",coalition.side.RED)
 bluea2gmission = MISSION:New(BCC,"IRON HAND","PRIMARY","Destroy Russian Forces",coalition.side.BLUE)
 rreeceset = SET_GROUP:New():FilterPrefixes({"Russian Army","RAFD"}):FilterCoalitions("red"):FilterActive():FilterStart()
-rattackset = SET_GROUP:New():FilterCoalitions("red"):FilterActive():FilterStart()
+rattackset = SET_GROUP:New():FilterPrefixes({"RUS"}):FilterCoalitions("red"):FilterActive():FilterStart()
 rdetectionareas = DETECTION_AREAS:New(rreeceset,3000)
 rTaskDispatcher = TASK_A2G_DISPATCHER:New(reda2gmission,rattackset,rdetectionareas)
 brecceset = SET_GROUP:New():FilterPrefixes({"AFAC","BAF","US Army","Apaches","Overlord"}):FilterCoalitions("blue"):FilterActive():FilterStart()
