@@ -29,7 +29,7 @@ env.info("Scenery Persistence Loading")
 
 csvFilePath = lfs.writedir() .."rib\\" .. "iberia3.csv" 
 local savefilename = "iberia2sceneryper.lua"
-local savefile = lfs.writedir() .."rib\\" .. savefilename
+local scenerysavefile = lfs.writedir() .."rib\\" .. savefilename
 local tgtsave = lfs.writedir() .."rib\\" .. "sceneryTgtList.lua"
 local SaveScheduleScenery=(60*5) -- how many seconds between saves. 5 minutes in th is case.
 explosionsize = 1000
@@ -228,8 +228,8 @@ maxSceneryCount = 500
 
 --CHECKING FOR PREVIOUS FILE OF ALL DESTROYED SCENERY
 if PersistedStore.resetall == 0 then
-  if file_exists(savefile) then
-    scenery = table.load(savefile)
+  if file_exists(scenerysavefile) then
+    scenery = table.load(scenerysavefile)
     env.info("Scenery file loaded")
       for i = 2,#scenery do
         local vec3 = COORDINATE:New(scenery[i].x, scenery[i].y, scenery[i].z)
@@ -253,7 +253,7 @@ if file_exists(tgtsave ) then
 else
   savedSceneryTbl={}
   env.info("Empty target list, writing new file")
-  table.save(scenery, savefile)
+  table.save(scenery, scenerysavefile)
 end
 
 
