@@ -1,5 +1,5 @@
-version = "2.2.10"
-lastupdate = "17-JAN-2020 2000AUEDST"
+version = "2.2.13"
+lastupdate = "28-JAN-2020 0410AUEDST"
 
 env.info("----------------------------------------------------------")
 env.info("--------------RED IBERIA VERSION ".. version .."----------------------")
@@ -826,14 +826,14 @@ RedKutDef = GROUP:FindByName("RTEMP Kut Def"),
 RedKutSpawn = SPAWN:NewWithAlias("RTEMP Kut Def","RAF Kutasi Defense"),
 RedKutSpawned = 0,
 RedArmy = GROUP:FindByName("Russian Army"),
-RedArmySpawn = SPAWN:NewWithAlias("Russian Army","RAF 1st Division"):InitRandomizeUnits(true,100,10),
+RedArmySpawn = SPAWN:NewWithAlias("Russian Army","RAF 1st Division"),
 RedArmySpawned = 0,
 RedArmyAlive = 1,
 RedArmyX = 0,
 RedArmyY = 0,
 RedArmyState = 0,
 RedArmyStateL = 5,
-RedArmySpawn1 = SPAWN:NewWithAlias("Russian Army 2","RAF 2nd Division"):InitRandomizeUnits(true,100,10),
+RedArmySpawn1 = SPAWN:NewWithAlias("Russian Army 2","RAF 2nd Division"),
 RedArmy1 = GROUP:FindByName("Russian Army 2"),
 RedArmy1Spawned = 0,
 RedArmyAlive1 = 1,
@@ -857,7 +857,7 @@ BlueKobDef = GROUP:FindByName("BAF Kob"),
 BlueKobSpawn = SPAWN:NewWithAlias("BAF Kob","COL Kobuleti Defense"),
 BlueKobSpawned = 0,
 BluArmy = GROUP:FindByName("US Army"),
-BluArmySpawn = SPAWN:NewWithAlias("US Army","COL 9th Division"):InitRandomizeUnits(true,100,10),
+BluArmySpawn = SPAWN:NewWithAlias("US Army","COL 9th Division"),
 BlueArmySpawned = 0,
 BluArmyAlive = 1,
 BluArmyX = 0,
@@ -1532,12 +1532,12 @@ do
       
       if self.RedArmyState == 0 then
         if self.RedArmyState ~= self.RedArmyStateL then
-          self.RedArmy:RouteGroundOnRoad(GUDZONE:GetRandomCoordinate(0,200),20,30,randomform())
+          routeground(self.RedArmy,0,true)
           self.RedArmyStateL = self.RedArmyState -- update our last state to match this state.
         end
       elseif self.RedArmyState == 1 then
         if self.RedArmyState ~= self.RedArmyStateL then
-          self.RedArmy:RouteGroundOnRoad(SUKZONE:GetRandomCoordinate(0,200),20,30,randomform())
+          routeground(self.RedArmy,1,true)
           self.RedArmyStateL = self.RedArmyState -- update our last state to match this state.
         end
       else
@@ -1610,27 +1610,27 @@ do
       BASE:E({self.name,"RED 2 Movement",self.RedArmyState1,self.RedArmyStateL1})
       if self.RedArmyState1 == 0 then
         if self.RedArmyStateL1 ~= self.RedArmyState1 then
-          self.RedArmy1:RouteGroundTo(GUDZONE:GetRandomCoordinate(0,200),20,randomform(),30)
+          routeground(self.RedArmy1,0,false)
           self.RedArmyStateL1 = self.RedArmyState1
         end
       elseif self.RedArmyState1 == 1 then
         if self.RedArmyStateL1 ~= self.RedArmyState1 then
-          self.RedArmy1:RouteGroundTo(SUKZONE:GetRandomCoordinate(0,200),20,randomform(),30)
+          routeground(self.RedArmy1,1,false)
           self.RedArmyStateL1 = self.RedArmyState1
         end
       elseif self.RedArmyState1 == 2 then
         if self.RedArmyStateL1 ~= self.RedArmyState1 then
-          self.RedArmy1:RouteGroundTo(SENZONE:GetRandomCoordinate(0,200),20,randomform(),30)
+          routeground(self.RedArmy1,2,false)
           self.RedArmyStateL1 = self.RedArmyState1
         end
       elseif self.RedArmyState1 == 3 then
         if self.RedArmyStateL1 ~= self.RedArmyState1 then
-          self.RedArmy1:RouteGroundTo(KUTZONE:GetRandomCoordinate(0,200),20,randomform(),30)
+          routeground(self.RedArmy1,3,true)
           self.RedArmyStateL1 = self.RedArmyState1
         end
       elseif self.RedArmyState1 == 4 then
         if self.RedArmyStateL1 ~= self.RedArmyState1 then
-          self.RedArmy1:RouteGroundTo(KOBZONE:GetRandomCoordinate(0,200),20,randomform(),30)
+          routeground(self.RedArmy1,4,true)
           self.RedArmyStateL1 = self.RedArmyState1
         end
       else
@@ -1641,7 +1641,38 @@ do
   
   BASE:E({self.name,"end Red Army 1,2",self.RedArmyState,self.RedArmyState1})
  end
- 
+ function routeground(_group,state,road)
+  if state == 0 and road == true then
+    _group:RouteGroundOnRoad(GUDZONE:GetRandomCoordinate(0,200),math.random(20,40),5,randomform())
+  end
+  if state == 0 and road == false then
+    _group:RouteGroundTo(GUDZONE:GetRandomCoordinate(0,200),math.random(20,40),randomform(),5)
+  end
+  if state == 1 and road == true then
+    _group:RouteGroundOnRoad(SUKZONE:GetRandomCoordinate(0,200),math.random(20,40),5,randomform())
+  end
+  if state == 1 and road == false then
+    _group:RouteGroundTo(SUKZONE:GetRandomCoordinate(0,200),math.random(20,40),randomform(),5)
+  end
+  if state == 2 and road == true then
+    _group:RouteGroundOnRoad(SENZONE:GetRandomCoordinate(0,200),math.random(20,40),5,randomform())
+  end
+  if state == 2 and road == false then
+    _group:RouteGroundTo(SENZONE:GetRandomCoordinate(0,200),math.random(20,40),randomform(),5)
+  end
+  if state == 3 and road == true then
+    _group:RouteGroundOnRoad(KUTZONE:GetRandomCoordinate(0,200),math.random(20,40),5,randomform())
+  end
+  if state == 3 and road == false then
+    _group:RouteGroundTo(KUTZONE:GetRandomCoordinate(0,200),math.random(20,40),randomform(),5)
+  end
+  if state == 4 and road == true then
+    _group:RouteGroundOnRoad(KOBZONE:GetRandomCoordinate(0,200),math.random(20,40),5,randomform())
+  end
+  if state == 4 and road == false then
+    _group:RouteGroundTo(KOBZONE:GetRandomCoordinate(0,200),math.random(20,40),randomform(),5)
+  end
+ end
  function RIB:DestroyGround(unit)
   BASE:E{"Call for the destruction of unit",unit}
   if unit == "blue1" then
@@ -1907,12 +1938,12 @@ do
     BASE:E({self.name, "Blue Army movement",self.BluArmyState,self.BluArmyStateL})
     if self.BluArmyState == 0 then
       if self.BluArmyStateL ~= self.BluArmyState then
-         self.BluArmy:RouteGroundOnRoad(GUDZONE:GetRandomCoordinate(0,200),20,30,randomform())
+        routeground(self.BluArmy,0,true)
          self.BluArmyStateL = self.BluArmyState
       end
     elseif self.BluArmyState == 1 then
       if self.BluArmyStateL ~= self.BluArmyState then
-        self.BluArmy:RouteGroundOnRoad(SUKZONE:GetRandomCoordinate(0,200),20,30,randomform())
+        routeground(self.BluArmy,1,true)
         self.BluArmyStateL = self.BluArmyState
       end
     end
@@ -1928,7 +1959,7 @@ do
     if ((SUKOWNER == 1) and (GUDOWNER == 1)) then
       -- if we aren't moving then we start routing to Kobuletti
       if self.BluArmyState1 == 5 then
-        self.BluArmyState1 = 4
+        self.BluArmyState1 = 1
       end
       if KOBOWNER ~= 2 then
         if self.BluArmyState1 ~= 4 then
@@ -1951,29 +1982,38 @@ do
           self.BluArmyState1 = 2        
         elseif self.BluArmyState1 == 3 and bpos1:Get2DDistance(dk) < 10000 then
           self.BluArmyState1 = 2
-        elseif self.BluArmyState1 ~= 2 then
-          self.BluArmyState1 = 2
+        elseif self.BluArmyState1 == 2 and bpos1:Get2DDistance(dk) < 1000 then
+          self.BluArmyState1 = 1
         end        
+      end
+    else
+      if self.BluArmyState1 ~= 1 then
+        self.BluArmyState = 1
       end
     end
   end
   BASE:E({self.name, "Blue Army 1 movement",self.BluArmyState1,self.BluArmyStateL1})
-    if self.BluArmyState1 < 2 then
-      self.BluArmyState1 = 4
+    if self.BluArmyState1 < 1 then
+      self.BluArmyState1 = 1
     end
-    if self.BluArmyState1 == 4 then
+    if self.BluArmyState1 == 1 then
+      if self.BluArmyState1 ~= self.BluArmyStateL1 then
+        routeground(self.BluArmy1,1,true)
+        self.BluArmyStateL1 = 1
+      end
+    elseif self.BluArmyState1 == 4 then
       if self.BluArmyStateL1 ~= self.BluArmyState1 then
-        self.BluArmy1:RouteGroundOnRoad(KOBZONE:GetRandomCoordinate(),20,30,randomform())
+        routeground(self.BluArmy1,4,true)
         self.BluArmyStateL1 = self.BluArmyState1
       end
     elseif self.BluArmyState1 == 3 then
       if self.BluArmyStateL1 ~= self.BluArmyState1 then
-        self.BluArmy1:RouteGroundOnRoad(KUTZONE:GetRandomCoordinate(),20,30,randomform())
+        routeground(self.BluArmy1,3,true)
         self.BluArmyStateL1 = self.BluArmyState1
       end 
     elseif self.BluArmyState1 == 2 then
       if self.BluArmyStateL1 ~= self.BluArmyState1 then
-        self.BluArmy1:RouteGroundOnRoad(SENZONE:GetRandomCoordinate(),20,30,randomform())
+        routeground(self.BluArmy1,2,true)
         self.BluArmyStateL1 = self.BluArmyState1
       end
     else
@@ -2026,17 +2066,17 @@ do
     BASE:E({self.name, "Blue Army 2 movement",self.BluArmyState2,self.BlueArmyStateL2})
     if self.BluArmyState2 == 4 then
       if self.BluArmyStateL2 ~= self.BluArmyState2 then
-        self.BluArmy2:RouteGroundOnRoad(KOBZONE:GetRandomCoordinate(),20,30,randomform())
+        routeground(self.BluArmy2,4,true)
         self.BluArmyStateL2 = self.BluArmyState2
       end
     elseif self.BluArmyState2 == 3 then
       if self.BluArmyStateL2 ~= self.BluArmyState2 then
-        self.BluArmy2:RouteGroundOnRoad(KUTZONE:GetRandomCoordinate(),20,30,randomform())
+        routeground(self.BluArmy2,3,true)
         self.BluArmyStateL2 = self.BluArmyState2
       end 
     elseif self.BluArmyState2 == 2 then
       if self.BluArmyStateL2 ~= self.BlueArmyState2 then
-        self.BluArmy2:RouteGroundOnRoad(SENZONE:GetRandomCoordinate(),20,30,randomform())
+        routeground(self.BluArmy2,2,true)
         self.BluArmyStateL2 = self.BluArmyState2
       end
     elseif self.BluArmyState2 == 5 then
@@ -4883,7 +4923,6 @@ lasthour = nil
 
 SCHEDULER:New(nil,function()  
 
-
   BASE:E({"Current Local time is:",nowYear,nowMonth,nowDay,nowHour,nowminute})
   if lasthour == nil then
     lasthour = nowHour
@@ -4892,7 +4931,7 @@ SCHEDULER:New(nil,function()
     lasthour = nowHour
     MESSAGE:New("SERVER TIME IS NOW:" .. nowHour .. ":" .. nowminute .. "",10):ToAll()
   end
-  if nowhour == 19 then
+  if nowHour == 19 then
     if nowminute == 00 then
       MESSAGE:New("A FORCED RESTART WILL OCCUR AT 8PM IN 60 MINUTES ",30):ToAll()
       if nowDay == 1 then
@@ -4924,7 +4963,7 @@ SCHEDULER:New(nil,function()
       MESSAGE:New("A FORCED RESTART WILL OCCUR AT 8PM IN 2 MINUTES",30):ToAll()
     end
     if nowminute == 59 then
-      MESSAGE:New("A FORCED RESTART WILL OCCUR AT 8PM IN 1 MINUTES",30):ToAll()
+      MESSAGE:New("A FORCED RESTART WILL OCCUR AT 8PM IN 1 MINUTE",30):ToAll()
     end
   end
  end,{},1,60)

@@ -32,7 +32,7 @@ local savefilename = "iberia2sceneryper.lua"
 local scenerysavefile = lfs.writedir() .."rib\\" .. savefilename
 local tgtsave = lfs.writedir() .."rib\\" .. "sceneryTgtList.lua"
 local SaveScheduleScenery=(60*5) -- how many seconds between saves. 5 minutes in th is case.
-explosionsize = 1000
+explosionsize = 2000
 --http://lua-users.org/wiki/SaveTableToFile
 
    local function exportstring( s )
@@ -278,7 +278,7 @@ end
 
 
 SCHEDULER:New( nil, function()
-table.save(scenery, savefile)--this is scenery persistence, nothing to do with targets
+table.save(scenery, scenerysavefile)--this is scenery persistence, nothing to do with targets
 --env.info(#savedSceneryTbl .." targets left")
 
 
@@ -368,5 +368,5 @@ end
 SCHEDULER:New( nil, function()
 table.save(savedSceneryTbl, tgtsave)
 end, {},1, 10)
---]]
+]]
 env.info("Scenery Persistence Loaded")

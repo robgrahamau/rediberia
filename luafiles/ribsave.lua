@@ -154,7 +154,7 @@ function savenewpersistence(RedSukSpawned,RedGudSpawned,RedSenSpawned,RedKutSpaw
   if RedSukSpawned == 0 then
       mainmission.RedSukSpawned = 0 
   else
-    if RedSukspawned:IsAlive() == true then
+    if RedSukSpawned:IsAlive() == true then
       mainmission.RedSukSpawned = RedSukSpawned:GetName()
     else
       mainmission.RedSukSpawned = 0
