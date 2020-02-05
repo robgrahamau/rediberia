@@ -1,5 +1,5 @@
-version = "2.2.13"
-lastupdate = "28-JAN-2020 0410AUEDST"
+version = "2.2.14"
+lastupdate = "6-FEB-2020 0725AUEDST"
 
 env.info("----------------------------------------------------------")
 env.info("--------------RED IBERIA VERSION ".. version .."----------------------")
@@ -160,6 +160,8 @@ mfm = mfmc:MarkToAll("Mayskiy Factory Awaiting Sat Pass",true)
 gfmc = ZONE:New("gleninfo")
 gfmc = gfmc:GetCoordinate()
 gfm = gfmc:MarkToAll("Gelendzhik Factory Awaiting Sat Pass",true)
+bluescore = 0
+redscore = 0
 do
 _mc = mozcommand:GetCoordinate()
 _nc = novocommand:GetCoordinate()
@@ -738,6 +740,11 @@ function disallowredgud()
   trigger.action.setUserFlag("RUS - MI8 GUD #001",100)
   trigger.action.setUserFlag("RUS - JF17 - GUD C&D",100)
   trigger.action.setUserFlag("RUS - JF17 - GUD C&D #001",100)
+  trigger.action.setUserFlag("RUS - F/A-18C - GUD C&D",100)
+  trigger.action.setUserFlag("RUS - F/A-18C - GUD C&D #002",100)
+  trigger.action.setUserFlag("RUS - F/A-18C - GUD C&D #001",100)
+  trigger.action.setUserFlag("RUS - F/A-18C - GUD C&D #003",100)
+  trigger.action.setUserFlag("RUS - F/A-18C - GUD C&D #004",100)
   BASE:E({"Red Slots should be closed at Gudauta"})
 end
 
@@ -766,6 +773,11 @@ function allowredgud()
   trigger.action.setUserFlag("RUS - MI8 GUD #001",0)
   trigger.action.setUserFlag("RUS - JF17 - GUD C&D",0)
   trigger.action.setUserFlag("RUS - JF17 - GUD C&D #001",0)
+  trigger.action.setUserFlag("RUS - F/A-18C - GUD C&D",0)
+  trigger.action.setUserFlag("RUS - F/A-18C - GUD C&D #002",0)
+  trigger.action.setUserFlag("RUS - F/A-18C - GUD C&D #001",0)
+  trigger.action.setUserFlag("RUS - F/A-18C - GUD C&D #003",0)
+  trigger.action.setUserFlag("RUS - F/A-18C - GUD C&D #004",0)
   BASE:E({"Red slots should be open at Gud."})
   glzc:Explosion(300,0)
   BASE:E({"GUD FOB SHOULD BE SPAWNING 30 SECONDS"})
@@ -2421,7 +2433,18 @@ function RIB:RInsurgents()
   end
   CurrentRound = PersistedStore.round
   LastRound = PersistedStore.lastround
-  
+  if PersistedStore.bluescore ~= nil then
+    bluescore = PersistedStore.bluescore 
+  else
+    PersistedStore.bluescore = 0
+    bluescore = 0
+  end
+  if PersistedStore.redscore ~= nil then
+    redscore = PersistedStore.redscore
+  else
+    PersistedStore.redscore = 0
+    redscore = 0
+  end 
   BASE:E({"ROUND COUNTER UPDATE",CurrentRound,LastRound,roundreset})
   local lastround = CurrentRound
   local round = CurrentRound + 1
@@ -4795,7 +4818,6 @@ local function permanentPlayerCheck()
       -- MESSAGE:New("Welcome to Red Iberia Version: "..version.." \n Last updated:".. lastupdate .." \n No Red on Red is Allowed \n Your current objective is to ".. redobject .."\n" ..rcomms .. "\n Remember Stores and Aircraft are limited and take time to resupply",60):ToClient(PlayerClient)
       -- PlayerClient:AddBriefing("Welcome to Red Iberia By Rob Graham Version: "..version.." \n Last updated:".. lastupdate .." \n POWERED BY MOOSE \n Current Server time is: ".. nowHour .. ":" .. nowminute .."\n Mission Restart Time: restart time:".. restarttime .. "\n No Red on Red is Allowed \n Your current objective is to ".. redobject .."\n" ..rcomms .. "\n Remember Stores and Aircraft are limited and take time to resupply")
       if PlayerClient:GetGroup() ~= nil then
-          local group = PlayerClient:GetGroup()
       end
       if PlayerClient:IsAlive() then
         if PlayerRMap[PlayerID] ~= true then
@@ -4918,6 +4940,44 @@ bTaskDispatcher = TASK_A2G_DISPATCHER:New(bluea2gmission,battackset,bdetectionar
 
   
 env.info("END MISSION SET UP")
+
+function addredscore(score)
+  redscore = redscore + score
+end
+function addbluescore(score)
+  bluescore = bluescore + score
+end
+
+
+function scoreupdate()
+  if GUDOWNER == 1 then
+    addredscore(25)
+  else
+    addbluescore(50)
+  end
+  if SUKOWNER == 1 then
+    addredscore(50)
+  else
+    addbluescore(25)
+  end
+  if SENOWNER == 1 then
+    addredscore(25)
+  else
+    addbluescore(1)
+  end
+  if KUTOWNER == 1 then
+    addredscore(25)
+  else
+    addbluescore(1)
+  end
+  if KOBOWNER == 1 then
+    addredscore(50)
+  else
+    addbluescore(1)
+  end
+  MESSAGE:New("Red Side Score is:".. redscore .. "|Blue Side Score is:"..bluescore .." Points",15):ToAll()
+end
+
 do
 lasthour = nil
 
@@ -4927,9 +4987,11 @@ SCHEDULER:New(nil,function()
   if lasthour == nil then
     lasthour = nowHour
     MESSAGE:New("SERVER TIME IS NOW:" .. nowHour .. ":" .. nowminute .. " DATE IS: " .. nowDay .. "-" .. nowMonth .."-" .. nowYear .. "",30):ToAll()
+    scoreupdate()
   elseif nowHour ~= lasthour then
     lasthour = nowHour
     MESSAGE:New("SERVER TIME IS NOW:" .. nowHour .. ":" .. nowminute .. "",10):ToAll()
+    scoreupdate()
   end
   if nowHour == 19 then
     if nowminute == 00 then
@@ -5021,7 +5083,7 @@ function factory()
     local prod = math.random(5,50)
     prod = prod / 10
       if fAlive(grp) == true then
-        if redgroundsupply <= 200 then
+        if redgroundsupply <= 100 then
           redgroundsupply = redgroundsupply + prod
         end
       nfact = nfact + prod
@@ -5030,7 +5092,7 @@ function factory()
     local prod = math.random(5,50)
       prod = prod / 10
       if fAlive(grp) == true then
-        if redgroundsupply <= 200 then
+        if redgroundsupply <= 100 then
           redgroundsupply = redgroundsupply + prod
         end
       mfact = mfact + prod
@@ -5039,7 +5101,7 @@ function factory()
     local prod = math.random(5,50)
       prod = prod / 10
       if fAlive(grp) == true then
-        if redgroundsupply <= 200 then
+        if redgroundsupply <= 100 then
           redgroundsupply = redgroundsupply + prod
         end
       mfact = mfact + prod
@@ -5048,7 +5110,7 @@ function factory()
     local prod = math.random(5,50)
       prod = prod / 10
       if fAlive(grp) == true then
-        if redgroundsupply <= 200 then
+        if redgroundsupply <= 100 then
           redgroundsupply = redgroundsupply + prod
         end
       mfact = mfact + prod
@@ -5057,7 +5119,7 @@ function factory()
     local prod = math.random(5,50)
       prod = prod / 10
       if fAlive(grp) == true then
-        if redgroundsupply <= 200 then
+        if redgroundsupply <= 100 then
           redgroundsupply = redgroundsupply + prod
         end
       afact = afact + prod
@@ -5066,7 +5128,7 @@ function factory()
     local prod = math.random(5,50)
       prod = prod / 10
       if fAlive(grp) == true then
-        if redgroundsupply <= 200 then
+        if redgroundsupply <= 100 then
           redgroundsupply = redgroundsupply + prod
         end
       afact = afact + prod
@@ -5075,7 +5137,7 @@ function factory()
     local prod = math.random(5,50)
       prod = prod / 10
       if fAlive(grp) == true then
-        if redgroundsupply <= 200 then
+        if redgroundsupply <= 100 then
           redgroundsupply = redgroundsupply + prod
         end
       afact = afact + prod
@@ -5130,7 +5192,7 @@ function factory()
     local prod = math.random(5,50)
       prod = prod / 10
       if fAlive(grp) == true then
-        if redgroundsupply <= 200 then
+        if redgroundsupply <= 100 then
           redgroundsupply = redgroundsupply + prod
         end
       kfact = kfact + prod
@@ -5139,7 +5201,7 @@ function factory()
     local prod = math.random(5,50)
       prod = prod / 10
       if fAlive(grp) == true then
-        if redgroundsupply <= 200 then
+        if redgroundsupply <= 100 then
           redgroundsupply = redgroundsupply + prod
         end
       kfact = kfact + prod
@@ -5148,7 +5210,7 @@ function factory()
     local prod = math.random(5,50)
       prod = prod / 10
       if fAlive(grp) == true then
-        if redgroundsupply <= 200 then
+        if redgroundsupply <= 100 then
           redgroundsupply = redgroundsupply + prod
         end
       kfact = kfact + prod
@@ -5157,7 +5219,7 @@ function factory()
     local prod = math.random(5,50)
       prod = prod / 10
       if fAlive(grp) == true then
-        if redgroundsupply <= 200 then
+        if redgroundsupply <= 100 then
           redgroundsupply = redgroundsupply + prod
         end
       kfact = kfact + prod
@@ -5166,7 +5228,7 @@ function factory()
     local prod = math.random(5,50)
       prod = prod / 10
       if fAlive(grp) == true then
-        if redgroundsupply <= 200 then
+        if redgroundsupply <= 100 then
           redgroundsupply = redgroundsupply + prod
         end
       kfact = kfact + prod

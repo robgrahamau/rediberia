@@ -78,6 +78,8 @@ local SaveSchedulePersistenceStore=60 --how many seconds between each check of a
     ["MayRound"] = 1,
     ["FactoryLast"] = 0,
     ["ReinforceLast"] = 0,
+    ["bluescore"] = 0,
+    ["redscore"] = 0,
 }
 PersistedStore = {
     ["round"] = 1,
@@ -123,6 +125,8 @@ PersistedStore = {
     ["MayRound"] = 1,
     ["FactoryLast"] = 0,
     ["ReinforceLast"] = 0,
+    ["bluescore"] = 0,
+    ["redscore"] = 0,
 }
 
 local savefilename = "gfalls.lua"
@@ -250,6 +254,8 @@ function PersistenceUpdateTable()
   PersistedStore.BluArmyState2 = mainthread.BluArmyState2 
   PersistedStore.resetall = RESETALL
   PersistedStore.roundreset = roundreset
+  PersistedStore.bluescore = bluescore
+  PersistedStore.redscore = redscore
 end
 
 function savePersistenceEngine()
