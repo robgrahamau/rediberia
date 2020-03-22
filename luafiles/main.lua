@@ -1,5 +1,5 @@
-version = "2.2.14"
-lastupdate = "6-FEB-2020 0725AUEDST"
+version = "2.2.17"
+lastupdate = "21-MAR-2020"
 
 env.info("----------------------------------------------------------")
 env.info("--------------RED IBERIA VERSION ".. version .."----------------------")
@@ -83,6 +83,7 @@ end
 
 
 -------- Main CONSTANT Variables ----------
+aboss = false
 roundreset = 8 -- This sets how many rounds before we reset to round one. each round is 6 hours so 4 = 24, 8 = 48. etc.
 ribadmin = false
 pstatic = false
@@ -105,6 +106,8 @@ RSHEL2_Timer = 0
 lastclientcount = 0
 factorytime = (60 * 60) * 2 -- Reinforce every 2 hours.  
 reinforcehours = (60 * 60) * 1 -- 1 hour
+ferrytime = (30 * 60) -- Reinforce every 30 as a base
+nextferrytime = 0 
 noclients = 0
 nooclients = true
 RESETALL = 0
@@ -592,6 +595,8 @@ function allowbluesuk()
   trigger.action.setUserFlag("RAA KA50 #001",0)
   trigger.action.setUserFlag("RAA Huey Suk",0)
   trigger.action.setUserFlag("RAA Huey Suk #001",0)
+  trigger.action.setUserFlag("USN F-14 VF103 HOT - SUK",0)
+  trigger.action.setUserFlag("USN F-14 VF103 HOT - SUK #001",0)
   BASE:E({"Blue Slots Should be Open at Suk"})
   slzc:Explosion(300,0)
   BASE:E({"SUK FOB SCHEDULER STARTING 30 SECONDS"})
@@ -655,6 +660,8 @@ function disallowbluesuk()
   trigger.action.setUserFlag("RAA KA50 #001",100)
   trigger.action.setUserFlag("RAA Huey Suk",100)
   trigger.action.setUserFlag("RAA Huey Suk #001",100)
+  trigger.action.setUserFlag("USN F-14 VF103 HOT - SUK",100)
+  trigger.action.setUserFlag("USN F-14 VF103 HOT - SUK #001",100)
   BASE:E({"Blue Slots Should be Closed at Suk"})
 end
 
@@ -1149,13 +1156,29 @@ do
    function RIB:SpawnSupports()
     BASE:E({self.name,"Running support script"})
     if self.REDAWAC:IsAlive() ~= true or self.REDAWAC:AllOnGround() == true then
-      self.RAWACS:Spawn()
+      if redairsupply > 0 then
+       self.RAWACS:Spawn()
+       redairsupply = redairsupply - 1
+      else
+       RCC:MessageToCoalition("Unable to launch a replacement AWACS as no air supply is avalible")
+      end 
     end
+    
     if self.REDTNKR:IsAlive() ~= true or self.REDTNKR:AllOnGround() == true then
-      self.RTNKR:Spawn()
+      if redairsupply > 0 then
+        self.RTNKR:Spawn()
+        redairsupply = redairsupply - 1
+      else
+        RCC:MessageToCoalition("Unable to launch a replacement Tanker as no air supply is avalible")
+      end
     end
     if self.REDTNKR2:IsAlive() ~= true or self.REDTNKR2:AllOnGround() == true then
-      self.RTNKR2:Spawn()
+      if redairsupply > 0 then
+        self.RTNKR2:Spawn()
+        redairsupply = redairsupply - 1
+      else
+        RCC:MessageToCoalition("Unable to launch a replacement Tanker as no air supply is avalible")
+      end
     end
     if self.BLUAWAC:IsAlive() ~= true or self.BLUAWAC:AllOnGround() == true then
       self.BAWACS:Spawn()
@@ -1306,7 +1329,7 @@ do
             SUKOWNER = 2
             BASE:E({self.name,"Blue Spawning Sukhumi Defenses."})
             if self.BlueSukSpawned ~= 0 then
-              self.BlueSukSpawened:Destroy()
+              self.BlueSukSpawned:Destroy()
             end
             self.BlueSukSpawned = self.BlueSukDefSpawn:Spawn()
             allowbluesuk()
@@ -1622,17 +1645,17 @@ do
       BASE:E({self.name,"RED 2 Movement",self.RedArmyState1,self.RedArmyStateL1})
       if self.RedArmyState1 == 0 then
         if self.RedArmyStateL1 ~= self.RedArmyState1 then
-          routeground(self.RedArmy1,0,false)
+          routeground(self.RedArmy1,0,true)
           self.RedArmyStateL1 = self.RedArmyState1
         end
       elseif self.RedArmyState1 == 1 then
         if self.RedArmyStateL1 ~= self.RedArmyState1 then
-          routeground(self.RedArmy1,1,false)
+          routeground(self.RedArmy1,1,true)
           self.RedArmyStateL1 = self.RedArmyState1
         end
       elseif self.RedArmyState1 == 2 then
         if self.RedArmyStateL1 ~= self.RedArmyState1 then
-          routeground(self.RedArmy1,2,false)
+          routeground(self.RedArmy1,2,true)
           self.RedArmyStateL1 = self.RedArmyState1
         end
       elseif self.RedArmyState1 == 3 then
@@ -3539,31 +3562,7 @@ SCHEDULER:New(nil,function()
   BASE:E({"CHECKING THINGS"})
   checkthings()
 end,{},60,(5*60))
-BASE:E("Stennis Heli")
--- start the airboss script
-RescueheloStennis = RESCUEHELO:New(UNIT:FindByName("Stennis"), "SARBIRD")
-RescueheloStennis:SetHomeBase(AIRBASE:FindByName("Normandy"))
-RescueheloStennis:SetTakeoffHot()
-RescueheloStennis:SetRescueOn()
-RescueheloStennis:SetRespawnOn()
-RescueheloStennis:SetTakeoffCold()
-RescueheloStennis:SetRescueHoverSpeed(1)
-RescueheloStennis:Start()
-BASE:E("Stennis Tanker")
-ShellStennis = RECOVERYTANKER:New(UNIT:FindByName("Stennis"), "Shell")
-ShellStennis:SetRespawnOn()
-ShellStennis:SetRespawnInAir()
-ShellStennis:SetSpeed(290)
-ShellStennis:SetCallsign(CALLSIGN.Tanker.Shell,1)
-ShellStennis:SetRacetrackDistances(15,10)
-ShellStennis:SetPatternUpdateDistance(10)
-ShellStennis:SetRadio(254)
-ShellStennis:SetModex(911)
-ShellStennis:SetTACAN(9,"SHL")
-ShellStennis:Start()
-stanker = true
 
-BASE:E("Stennis Airboss")
 
 function invasion()
   rangers = GROUP:FindByName("Rangers")
@@ -3627,33 +3626,63 @@ invasionmenu = MENU_COALITION:New(coalition.side.BLUE, "Ai Control",b_ribmenu)
 bcapm = MENU_COALITION_COMMAND:New(coalition.side.BLUE,"Request Ukraine C.A.P over A.O",invasionmenu,spawnbaicap)
 invasionm = MENU_COALITION_COMMAND:New(coalition.side.BLUE,"Request Ranger Assault on Sukhimi",invasionmenu,invasion)
 
-local AirbossStennis = AIRBOSS:New("Stennis","Mother")
--- Delete auto recovery window.
-function AirbossStennis:OnAfterStart(From,Event,To)
-  self:DeleteAllRecoveryWindows()
+
+if aboss == true then
+  BASE:E("Stennis Heli")
+  -- start the airboss script
+  
+  RescueheloStennis = RESCUEHELO:New(UNIT:FindByName("Stennis"), "SARBIRD")
+  RescueheloStennis:SetHomeBase(AIRBASE:FindByName("Normandy"))
+  RescueheloStennis:SetTakeoffHot()
+  RescueheloStennis:SetRescueOn()
+  RescueheloStennis:SetRespawnOn()
+  RescueheloStennis:SetTakeoffCold()
+  RescueheloStennis:SetRescueHoverSpeed(1)
+  RescueheloStennis:Start()
+  BASE:E("Stennis Tanker")
+  ShellStennis = RECOVERYTANKER:New(UNIT:FindByName("Stennis"), "Shell")
+  ShellStennis:SetRespawnOn()
+  ShellStennis:SetRespawnInAir()
+  ShellStennis:SetSpeed(290)
+  ShellStennis:SetCallsign(CALLSIGN.Tanker.Shell,1)
+  ShellStennis:SetRacetrackDistances(15,10)
+  ShellStennis:SetPatternUpdateDistance(10)
+  ShellStennis:SetRadio(254)
+  ShellStennis:SetModex(911)
+  ShellStennis:SetTACAN(9,"SHL")
+  ShellStennis:Start()
+  stanker = true
+
+  BASE:E("Stennis Airboss")
+
+  AirbossStennis = AIRBOSS:New("Stennis","Mother")
+  -- Delete auto recovery window.
+  function AirbossStennis:OnAfterStart(From,Event,To)
+    self:DeleteAllRecoveryWindows()
+  end
+  AirbossStennis:Load()
+  AirbossStennis:SetAutoSave(lsosavepath)
+  AirbossStennis:SetMarshalRadio(305)
+  AirbossStennis:SetLSORadio(118.30)
+  AirbossStennis:SetTACAN(55,"X","STN")
+  -- AirbossStennis:SetRadioRelayLSO(RescueheloStennis)
+  -- AirbossStennis:SetRadioRelayMarshal(NAWAC2)
+  AirbossStennis:SetSoundfilesFolder("Airboss Soundfiles/")
+  AirbossStennis:SetAirbossNiceGuy(true)
+  if stanker then
+    AirbossStennis:SetRecoveryTanker(ShellStennis)
+  end
+  AirbossStennis:SetDespawnOnEngineShutdown(true)
+  AirbossStennis:SetRefuelAI(20)
+  AirbossStennis:SetTrapSheet(lsosavepath)
+  AirbossStennis:SetMenuRecovery(30,25,false,30)
+  AirbossStennis:SetHoldingOffsetAngle(0)
+  AirbossStennis:SetRadioRelayLSO("LSOComms")
+  AirbossStennis:SetRadioRelayMarshal("MarshallComms")
+  AirbossStennis:SetMenuSingleCarrier(true)
+  -- Start airboss script.
+  AirbossStennis:Start()
 end
-AirbossStennis:Load()
-AirbossStennis:SetAutoSave(lsosavepath)
-AirbossStennis:SetMarshalRadio(305)
-AirbossStennis:SetLSORadio(118.30)
-AirbossStennis:SetTACAN(55,"X","STN")
--- AirbossStennis:SetRadioRelayLSO(RescueheloStennis)
--- AirbossStennis:SetRadioRelayMarshal(NAWAC2)
-AirbossStennis:SetSoundfilesFolder("Airboss Soundfiles/")
-AirbossStennis:SetAirbossNiceGuy(true)
-if stanker then
-  AirbossStennis:SetRecoveryTanker(ShellStennis)
-end
-AirbossStennis:SetDespawnOnEngineShutdown(true)
-AirbossStennis:SetRefuelAI(20)
-AirbossStennis:SetTrapSheet(lsosavepath)
-AirbossStennis:SetMenuRecovery(30,25,false,30)
-AirbossStennis:SetHoldingOffsetAngle(0)
-AirbossStennis:SetRadioRelayLSO("LSOComms")
-AirbossStennis:SetRadioRelayMarshal("MarshallComms")
-AirbossStennis:SetMenuSingleCarrier(true)
--- Start airboss script.
-AirbossStennis:Start()
 
 local function mudhenCooldownHelp()
   BCC:MessageToCoalition(string.format("Su-27s commands are now available again. Use the following marker commands:\n-cap route\n-cap patrol\n-cap refuel \nor you can add extra information for finer control \n-cap <command> ,h <0-360>,d <0-150>,a <1-50>,s <250-850> \nFor more control"), MESSAGE.Type.Information)
@@ -4927,17 +4956,20 @@ SCHEDULER:New(nil,function()
   end,{}, (60*60)*5.5) 
 end
 BASE:E("SETTING UP TASKING MISSIONS")
-reda2gmission = MISSION:New(RCC,"RED HAMMER","PRIMARY","Destroy the Western Forces so we can retake what is ours",coalition.side.RED)
-bluea2gmission = MISSION:New(BCC,"IRON HAND","PRIMARY","Destroy Russian Forces",coalition.side.BLUE)
-rreeceset = SET_GROUP:New():FilterPrefixes({"Russian Army","RAFD"}):FilterCoalitions("red"):FilterActive():FilterStart()
-rattackset = SET_GROUP:New():FilterPrefixes({"RUS"}):FilterCoalitions("red"):FilterActive():FilterStart()
-rdetectionareas = DETECTION_AREAS:New(rreeceset,3000)
-rTaskDispatcher = TASK_A2G_DISPATCHER:New(reda2gmission,rattackset,rdetectionareas)
-brecceset = SET_GROUP:New():FilterPrefixes({"AFAC","BAF","US Army","Apaches","Overlord"}):FilterCoalitions("blue"):FilterActive():FilterStart()
-bdetectionareas = DETECTION_AREAS:New(brecceset,3000)
-battackset = SET_GROUP:New():FilterPrefixes({"USAF","FAF","GAF","RAAF","USMC","USN","GAA","RAA","UA","UAF","USAA"}):FilterActive():FilterStart()
-bTaskDispatcher = TASK_A2G_DISPATCHER:New(bluea2gmission,battackset,bdetectionareas)
+runmissions = false
 
+if runmissions == true then
+  reda2gmission = MISSION:New(RCC,"RED HAMMER","PRIMARY","Destroy the Western Forces so we can retake what is ours",coalition.side.RED)
+  bluea2gmission = MISSION:New(BCC,"IRON HAND","PRIMARY","Destroy Russian Forces",coalition.side.BLUE)
+  rreeceset = SET_GROUP:New():FilterPrefixes({"Russian Army","RAFD"}):FilterCoalitions("red"):FilterActive():FilterStart()
+  rattackset = SET_GROUP:New():FilterPrefixes({"RUS"}):FilterCoalitions("red"):FilterActive():FilterStart()
+  rdetectionareas = DETECTION_AREAS:New(rreeceset,3000)
+  rTaskDispatcher = TASK_A2G_DISPATCHER:New(reda2gmission,rattackset,rdetectionareas)
+  brecceset = SET_GROUP:New():FilterPrefixes({"AFAC","BAF","US Army","Apaches","Overlord"}):FilterCoalitions("blue"):FilterActive():FilterStart()
+  bdetectionareas = DETECTION_AREAS:New(brecceset,3000)
+  battackset = SET_GROUP:New():FilterPrefixes({"USAF","FAF","GAF","RAAF","USMC","USN","GAA","RAA","UA","UAF","USAA"}):FilterActive():FilterStart()
+  bTaskDispatcher = TASK_A2G_DISPATCHER:New(bluea2gmission,battackset,bdetectionareas)
+end
   
 env.info("END MISSION SET UP")
 
@@ -5033,7 +5065,49 @@ SCHEDULER:New(nil,function()
 function fAlive(grp)
 if grp:IsAlive() then return true else return false end
 end
+ferrytemplates = {"ferry18","ferryau18","ferry16","c17","c130","ferrye3","ferrykc135","ferrykcmprs"}
+ferryspawn = SPAWN:New("FerryFlight"):InitRandomizeTemplate(ferrytemplates):InitRandomizeRoute(0,4,UTILS.NMToMeters(15),UTILS.FeetToMeters(2000))
+ferryspawn2 = SPAWN:New("FerryFlight2"):InitRandomizeTemplate({"ferry18","ferryau18","ferry16","c17","ferrye3","ferrykc135","ferrykcmprs"}):InitRandomizeRoute(0,4,UTILS.NMToMeters(15),UTILS.FeetToMeters(2000))
+ferry = nil
+ferry2 = nil
+function ferrytimer()
+  if ferry == nil then
+      ferry = ferryspawn:Spawn()
+      BASE:E({"Ferry Flight should be spawned"})
+  else
+    
+   if ferry:IsAlive() == true and ferry:AllOnGround() == true then
+        BASE:E({"Ferry Flight was on the ground, should be respawned"})
+        ferry:Destroy()
+        ferry = ferryspawn:Spawn()
+   end
+    if ferry:IsAlive() ~= true then
+        ferry = ferryspawn:Spawn()
+        BASE:E({"Ferry Flight was Dead, should be respawned"})
+    end
+  end
+  
+  if ferry2 == nil then
+      ferry2 = ferryspawn2:Spawn()
+      BASE:E({"Ferry 2 Flight should be spawned"})
+  else
+    
+   if ferry2:IsAlive() == true and ferry2:AllOnGround() == true then
+        BASE:E({"Ferry Flight was on the ground, should be respawned"})
+        ferry2:Destroy()
+        ferry2 = ferryspawn2:Spawn()
+   end
+    if ferry2:IsAlive() ~= true then
+        ferry2 = ferryspawn2:Spawn()
+        BASE:E({"Ferry Flight was Dead, should be respawned"})
+    end
+  end
+end
+
 function factory()
+    
+    
+    
     AllStatics = SET_STATIC:New():FilterPrefixes({"DEPOT"}):FilterOnce()
     gfact = 0
     nfact = 0
@@ -5312,6 +5386,19 @@ function checkcommandrebuild()
 
     -- ok take the now time if it's greater then our factory last + the factorytime then run
     if init == true then
+      do
+      if nextferrytime == 0 then
+        ferrytimer()
+        nextferrytime = nowtime + (ferrytime + math.random(0,30) )
+        BASE:E({"next ferry time is:",nextferrytime})
+      else
+        if nowtime > nextferrytime then
+          ferrytimer()
+          nextferrytime = nowtime + (ferrytime + math.random(0,30) )
+          BASE:E({"next ferry time is:",nextferrytime})
+        end
+      end
+      end
        if pstatic == true then
           if nowtime > (PersistedStore.FactoryLast + factorytime) then
             BASE:E("Running Factory as FactoryLast + factorytime was < nowtime")
@@ -5320,6 +5407,7 @@ function checkcommandrebuild()
             local nextrun = PersistedStore.FactoryLast + factorytime 
             BASE:E({"Next Factory Run should be at ",os.date('%A, %B %d %Y at %I:%M:%S %p',nextrun)})        
         end
+        
       if nowtime > (PersistedStore.ReinforceLast + reinforcehours) then
         BASE:E({"Running Reinforce Sqns as ready to run"})
         reinforcesqns()

@@ -272,19 +272,17 @@ ctld.extractableGroups = {
 -- When a logistic unit is destroyed, you will no longer be able to spawn crates
 
 ctld.logisticUnits = {
-    "London",
-    "FOBWARSAW",
-    "Otkrytka",
-    "FOB-OTKRYTKA",
-    "FOB-LONDON",
-    "RFARP1-1",
     "FARP1-1",
     "FARP1-4",
-    "RFARP2-1",
     "FARP2-1",
-    "RFARP3-1",
     "FARP3-1",
-    "Warsaw",
+    "FARP3-2",
+    "FARP-Kaemka",
+    "FARP-Otrytka",
+    "RFARP1-1",
+    "RFARP2-1",    
+    "RFARP3-1",
+
 }
 
 -- ************** UNITS ABLE TO TRANSPORT VEHICLES ******************
@@ -4287,7 +4285,7 @@ function ctld.inLogisticsZone(_heli)
     for _, _name in pairs(ctld.logisticUnits) do
 
         local _logistic = StaticObject.getByName(_name)
-
+        BASE:E({_logistic,_heli})
         if _logistic ~= nil and _logistic:getCoalition() == _heli:getCoalition() then
 
             --get distance
