@@ -118,8 +118,8 @@ RAS1 = ZONE_POLYGON:New("RAS1",GROUP:FindByName("RAS1")) -- red airspace
 RAS2 = ZONE_POLYGON:New("RAS2",GROUP:FindByName("RAS2")) -- red airspace
 BAS = ZONE_POLYGON:New("BAS",GROUP:FindByName("BAS"))
 BAS1 = ZONE_POLYGON:New("BAS1",GROUP:FindByName("BAS1")) -- bull airspace
-SAS = ZONE_POLYGON:New("SAS",GROUP:FindByName("SAS")) -- Stennis airspace
-SAS1 = ZONE_POLYGON:New("SAS1",GROUP:FindByName("SAS1")) -- Stennis airspace
+-- SAS = ZONE_POLYGON:New("SAS",GROUP:FindByName("SAS")) -- Stennis airspace
+-- SAS1 = ZONE_POLYGON:New("SAS1",GROUP:FindByName("SAS1")) -- Stennis airspace
 RCAP = ZONE_POLYGON:New("RED CAPZONE",GROUP:FindByName("RCAP"))
 RCAP2 = ZONE_POLYGON:New("RED CAPZONE1",GROUP:FindByName("RCAP2"))
 RCAP3 = ZONE_POLYGON:New("RED CAPZONE2",GROUP:FindByName("RCAP3"))
@@ -270,7 +270,7 @@ end,{}):InitCleanUp(300):InitRepeatOnEngineShutDown()
 
 
 -- carrier status and update items -- 
-stennis = GROUP:FindByName("Stennis") -- get the stennis group
+-- stennis = GROUP:FindByName("Stennis") -- get the stennis group
 
 BLUEAWAC = GROUP:FindByName("Overlord")
 init = false
@@ -1044,16 +1044,16 @@ do
       self.rinsurgent4m = coord:MarkToCoalitionRed(text1,false)
       self.rinsurgent4t = text
     end)
-    self.BLUAWAC2 = GROUP:FindByName("Magic")
-    self.BAWACS2 = SPAWN:NewWithAlias("Magic","Magic"):InitCleanUp(120):InitRepeatOnLanding():OnSpawnGroup(function(SpawnGroup) 
-      if self.BLUAWAC2 ~= nil then
-        self.BLUAWAC2:Destroy()
-      end      
-      Scoring:AddScoreGroup(SpawnGroup,30)
-      BASE:E({self.name},"SPAWNING MAGIC")
-      BCC:MessageToCoalition("Magic 11 is active on 250")
-      self.BLUAWAC2 = SpawnGroup
-    end)
+    --self.BLUAWAC2 = GROUP:FindByName("Magic")
+    --self.BAWACS2 = SPAWN:NewWithAlias("Magic","Magic"):InitCleanUp(120):InitRepeatOnLanding():OnSpawnGroup(function(SpawnGroup) 
+--      if self.BLUAWAC2 ~= nil then
+--        self.BLUAWAC2:Destroy()
+--      end      
+--      Scoring:AddScoreGroup(SpawnGroup,30)
+--      BASE:E({self.name},"SPAWNING MAGIC")
+--      BCC:MessageToCoalition("Magic 11 is active on 250")
+--      self.BLUAWAC2 = SpawnGroup
+--    end)
     self.REDAWAC = GROUP:FindByName("Wizard") -- store redawacs
     -- set up the spawn for when we start everything.
     self.RAWACS = SPAWN:NewWithAlias("Wizard","Wizard"):InitCleanUp(120):InitRepeatOnEngineShutDown():OnSpawnGroup(function(SpawnGroup)
@@ -1166,9 +1166,9 @@ do
     if self.BLUTNKR2:IsAlive() ~= true or self.BLUTNKR2:AllOnGround() == true then
       self.BTNKR2:Spawn()
     end
-    if self.BLUAWAC2:IsAlive() ~= true or self.BLUAWAC2:AllOnGround() == true then
-      self.BAWACS2:Spawn()
-    end
+    --if self.BLUAWAC2:IsAlive() ~= true or self.BLUAWAC2:AllOnGround() == true then
+--      self.BAWACS2:Spawn()
+    --end
     if self.afac:IsAlive() ~= true or self.afac:AllOnGround() == true then
       self.afacs:Spawn()
     end
@@ -3244,7 +3244,7 @@ ra2adisp:SetSquadronGci("SochiSqn",UTILS.KnotsToKmph(450),UTILS.KnotsToKmph(650)
 mainthread.kobsqn = spawnA2ACap("kobSqn",kob,BCAPTEMPLATES,1,math.random(12,24),BCAP,BAS,120,15000,35000,300,450,(60*2),(60*15),0.5)
 mainthread.kutsqn = spawnA2ACap("kutSqn",kut,BCAPTEMPLATES,1,math.random(12,24),BCAP2,BAS,120,15000,35000,300,450,(60*2),(60*15),0.5)
 mainthread.sensqn = spawnA2ACap("senSqn",sen,BCAPTEMPLATES,1,math.random(12,24),BCAP3,BAS,120,15000,35000,300,450,(60*2),(60*15),0.5)
-mainthread.vfa192 = spawnA2ACap("vfa192",vfa192,SCAPTEMPLATES,2,math.random(12,24),SAS1,SAS,60,20000,30000,350,450,(60*2),(60*15),0.5)
+-- mainthread.vfa192 = spawnA2ACap("vfa192",vfa192,SCAPTEMPLATES,2,math.random(12,24),SAS1,SAS,60,20000,30000,350,450,(60*2),(60*15),0.5)
 
 do
   -- if russian HQ is blown up we want to set randomised radar for chaos..
@@ -4777,7 +4777,7 @@ local function permanentPlayerCheck()
     end
     
     rcomms = "ARCO - KC135 Drogue 5x U252 | Wizard - E3 AWACS U251. | FOB Otkrytka - 127.5"
-    bcomms = "Overlord - E3 AWACS U251. | Magic - E2 AWACS U250 2Y |ARCO11 - KC135 Drogue 3x U252 \n Texaco - KC135 15X U253 | Shell - S3 9Y/X U254 \n Stennis: 55X STN, 1ICLS, A118.3, M305 (Check Kneeboard) | Tarawa: 75X | LONDON: 122.5 | AFAC 133AM"
+    bcomms = "Overlord - E3 AWACS U251.  |ARCO11 - KC135 Drogue 3x U252 \n Texaco - KC135 15X U253 | Shell - S3 9Y/X U254 \n Stennis: 55X STN, 1ICLS, A118.3, M305 (Check Kneeboard) | Tarawa: 75X | LONDON: 122.5 | AFAC 133AM"
     if GUDOWNER ~= 1 then
         redobject = "Retake Gudauta,"
         blueobject = "Defend Gudauta,"
