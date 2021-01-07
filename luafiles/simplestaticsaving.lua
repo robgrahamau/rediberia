@@ -29,7 +29,25 @@
 local SaveScheduleStatics=60 --how many seconds between each check of all the statics.
 local savefilename = "staticsave.lua"
 local savefile = lfs.writedir() .."rib\\" .. savefilename
-AllStatics = SET_STATIC:New():FilterPrefixes({"DEPOT"}):FilterStart()
+Allstatics1 = SET_STATIC:New():FilterStart()
+Allstatics = SET_STATIC:New()
+function no_farps()
+  Allstatics1:ForEach(function (stat)
+    local _name = stat:GetName()
+    if AIRBASE:FindByName(_name) ~= nil then
+      --env.info(_name.." is a type of airbase, farp or oil rig")
+      --avoid these types of static, they are really airbases
+	else
+		local prefix = "DEPOT"
+		local b = _name:find(prefix) == 1
+		if b == true then
+			Allstatics:AddStatic(stat)
+		end
+	end
+  end)
+end
+no_farps()
+
  -----------------------------------
  --Do not edit below here
  -----------------------------------
@@ -136,6 +154,7 @@ end
 
 --THE SAVING SCHEDULE
 SCHEDULER:New( nil, function()
+no_farps()
 AllStatics:ForEach(function (grp)
 
 SaveStatics[grp:GetName()] =
@@ -161,6 +180,7 @@ SaveStatics[grp:GetName()] =
 end)--end of the for each groupAlive iteration
 
 local newMissionStr = IntegratedserializeWithCycles("SaveStatics",SaveStatics)
+
 writemission(newMissionStr, savefile)
 SaveStatics={} --flatten this between iterations to prevent accumulations
 --env.info("Data saved.")

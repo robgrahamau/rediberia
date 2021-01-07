@@ -33,7 +33,7 @@
  --Configurable for user:
  local SaveScheduleUnits=60 --how many seconds between each check of all the statics.
  AllGroups = SET_GROUP:New():FilterCategories("ground"):FilterPrefixes({"RSAM","RRSUP","REWR","BSAM","BEWR","RAF","COL","ctld",}):FilterActive(true):FilterStart()
- local savefilename = "rediberia1.lua"
+ local savefilename = "ribgroupsave.lua"
  
  local savefile = lfs.writedir() .. "rib\\" .. savefilename
  -----------------------------------

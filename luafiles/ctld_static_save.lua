@@ -26,13 +26,34 @@
 --I experienced issues Spawning Statics and Destroying statics in some configurations, so I'm exploding them and not deleting them like SGS. 
 
   --Configurable for user:
-local SaveScheduleStatics=60 --how many seconds between each check of all the statics.
+local SaveScheduleStatics=120 --how many seconds between each check of all the statics.
 
 --- THIS IS NOT WORKING CORRECTLY AT THE MOMENT. NEED TO CODE OUT A BETTER MEANS.
 -- 
 local savefilename = "ctldstaticsave.lua"
 local savefile = lfs.writedir() .."rib\\" .. savefilename
-CTLDStatics = SET_STATIC:New():FilterPrefixes({"CTLD","ctld"}):FilterStart()
+CTLDStatics = SET_STATIC:New()
+local function ctldsave_no_farps()
+  Allstatics1:ForEach(function (stat)
+    local _name = stat:GetName()
+    if AIRBASE:FindByName(_name) ~= nil then
+      --env.info(_name.." is a type of airbase, farp or oil rig")
+      --avoid these types of static, they are really airbases
+    else
+    local prefix = "CTLD"
+    local b = _name:find(prefix) == 1
+    if b == true then
+      CTLDStatics:AddStatic(stat)
+    end
+    prefix = "ctld"
+    local b = _name:find(prefix) == 1
+    if b == true then
+      CTLDStatics:AddStatic(stat)
+    end
+  end
+  end)
+end
+ctldsave_no_farps()
  -----------------------------------
  --Do not edit below here
  -----------------------------------
@@ -100,7 +121,8 @@ function writemission(data, file)--Function for saving to file (commonly found)
 end
 
 function Alive(grp)
-if grp:IsAlive() then return false else return true end
+	local ts= STATIC:FindByName(grp:GetName())
+	if ts:IsAlive() then return false else return true end
 end
 
 function rngsmokes(coordinate)
@@ -119,45 +141,121 @@ env.info("Loaded Simple Statics Saving, by Pikey, 2018, (updated Dec 2019) versi
 if file_exists(savefile) then
   env.info("Script loading existing database")
   dofile(savefile)
-  BASE:E({"CTLD static do file done",CTLDSaveStatics})
+  BASE:E({"CTLD static do file done",CTLDCTLDSaveStatics})
   --This version uses Destroy()
-
-  BASE:E({"for each entered",grp,grp:GetName()})
+	ctldsave_no_farps()
   for k, v in pairs(CTLDSaveStatics) do
-      BASE:E({"Found a CTLD Static Item is",v})
+      --BASE:E({"Found a CTLD Static Item is",v})
+      if STATIC:FindByName(v.name,false) ~= nil then
+        --BASE:E({"We have ctld item in game"})
+        local static = STATIC:FindByName(v.name)
+        if v.dead == true then
+          static:Destroy()
+        end
+      else
+        BASE:E({"We have a ctld item but it's NOT in the game yet."})
+        if v.dead ~= true then
+          if v.type ~= "container_cargo" then
+            local item = {
+              ["category"] = "Fortifications",
+              ["type"] = v.type,
+              ["y"] = v.y,
+              ["x"] = v.x,
+              ["name"] = v.name,
+              ["heading"] = 0,
+              ["country"] = v.Country,
+            }
+          mist.dynAddStatic(item)
+          else
+          BASE:E({"Type Was cargo Container"})
+          end
+        end
+      end
   end
 else --Save File does not exist we start a fresh table
-  SaveStatics={}
+  CTLDSaveStatics={}
 end
 
 --THE SAVING SCHEDULE
 SCHEDULER:New( nil, function()
+ctldsave_no_farps()
+
 CTLDStatics:ForEach(function (grp)
-
-CTLDSaveStatics[grp:GetName()] =
-
--- In case destroying silently and spawning is fixed I'm leaving it to be used to spawn statics in the
--- format required for coalition.addStaticObject(SaveStatics[k]["Country"], staticData) .
-
-{
- -- ["heading"] = grp:GetHeading(),
-  --["groupId"] =grp:GetID(),
- -- ["shape_name"] = "stolovaya",
-   ["type"] = grp:GetTypeName(),
-  --["unitId"] = grp:GetID(),
- -- ["rate"] = 100,
-  ["name"] = grp:GetName(),
-  --["category"] = "Fortifications",
-  ["y"] = grp:GetVec2().y, 
-  ["x"] = grp:GetVec2().x, 
-  ["dead"] = Alive(grp),
-  ["Country"] = grp:GetCountry()
-}
-
+	local tempstatic = STATIC:FindByName(grp:GetName())
+	if tempstatic:IsAlive() == true then
+		--BASE:E({"We are dumping some info here for CTLDStatics We got TRUE on IsAlive()"})
+		--BASE:E({"grp",grp})
+		--BASE:E({"tempstatic",tempstatic})
+		--BASE:E({"tempstatic Get Coordinate",tempstatic:GetCoordinate()})
+		--BASE:E({"tempstatic Get Vec2",tempstatic:GetVec2()})
+		local tvec2 = tempstatic:GetVec2()
+		CTLDSaveStatics[grp:GetName()] = 
+		{
+			["type"] = grp:GetTypeName(),
+			["name"] = grp:GetName(),
+			["y"] = tvec2.y, 
+			["x"] = tvec2.x,
+			["dead"] = Alive(grp),
+			["Country"] = tempstatic:GetCountry()
+		}
+	else
+		--BASE:E({"We are dumping some info here for CTLDStatics We got NOT TRUE on IsAlive()"})
+		--BASE:E({"grp",grp})
+		--BASE:E({"tempstatic",tempstatic})
+		CTLDSaveStatics[grp:GetName()] = 
+		{
+			["type"] = grp:GetTypeName(),
+			["name"] = grp:GetName(),
+			["y"] = 0, 
+			["x"] = 0,
+			["dead"] = Alive(grp),
+			["Country"] = tempstatic:GetCountry()
+		}
+	end
+	--[[
+  if Alive(grp) == true then
+	
+	BASE:E({"staticdump",tempstatic})
+	local pos = tempstatic:GetCoordinate()
+	BASE:E({"Coordinate Dump",pos})
+	CTLDSaveStatics[grp:GetName()] =
+	-- In case destroying silently and spawning is fixed I'm leaving it to be used to spawn statics in the
+	-- format required for coalition.addStaticObject(CTLDSaveStatics[k]["Country"], staticData) .
+	{
+		-- ["heading"] = grp:GetHeading(),
+		--["groupId"] =grp:GetID(),
+		-- ["shape_name"] = "stolovaya",
+		["type"] = grp:GetTypeName(),
+		--["unitId"] = grp:GetID(),
+		-- ["rate"] = 100,
+		["name"] = grp:GetName(),
+		--["category"] = "Fortifications",
+		["y"] = tempstatic:GetVec2().y, 
+		["x"] = tempstatic:GetVec2().x, 
+		["dead"] = Alive(grp),
+		["Country"] = tempstatic:GetCountry()
+	}
+  else
+	CTLDSaveStatics[grp:GetName()] ={
+		-- ["heading"] = grp:GetHeading(),
+		--["groupId"] =grp:GetID(),
+		-- ["shape_name"] = "stolovaya",
+		["type"] = grp:GetTypeName(),
+		--["unitId"] = grp:GetID(),
+		-- ["rate"] = 100,
+		["name"] = grp:GetName(),
+		--["category"] = "Fortifications",
+		["y"] = 0, 
+		["x"] = 0, 
+		["dead"] = Alive(grp),
+		["Country"] = grp:GetCountry()
+	}
+  end
+]]
 end)--end of the for each groupAlive iteration
 
 local newMissionStr = IntegratedserializeWithCycles("CTLDSaveStatics",CTLDSaveStatics)
 writemission(newMissionStr, savefile)
-SaveStatics={} --flatten this between iterations to prevent accumulations
+CTLDSaveStatics={} --flatten this between iterations to prevent accumulations
 --env.info("Data saved.")
 end, {}, 1, SaveScheduleStatics)

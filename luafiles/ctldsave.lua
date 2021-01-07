@@ -24,12 +24,20 @@
  --LIMITATIONS
  --Only Ground Groups and Units are specified, play with the SET Filter at your own peril. Could be adjusted for just one Coalition or a FilterByName().
  --See line 107 and 168 for the SET.
- --See https://flightcontrol-master.github.io/MOOSE_DOCS_DEVELOP/Documentation/Core.Set.html##(SET_GROUP)
- --Naval Groups not Saved. If Included, there may be issues with spawned objects and Client slots where Ships have slots for aircraft/helo. Possible if not a factor
- --Statics are not included. See 'Simple Static Saving' for a solution
- --Routes are not saved. Uncomment lines 148-153 if you wish to keep them, but they won't activate them on restart. It is impossible to query a group for it's current
- --route, only for the original route it recieved from the Mission Editor. Therefore a DCS limitation.
- -----------------------------------
+ defaultlogisticUnits = {
+ "FARP1-1",
+    "FARP1-4",
+    "FARP2-1",
+    "FARP3-1",
+    "FARP3-2",
+    "FARP-Kaemka",
+    "FARP-Otrytka",
+    "RFARP1-1",
+    "RFARP2-1",    
+    "RFARP3-1",
+}
+
+
  --Configurable for user:
 local SaveSchedulePersistence=60 --how many seconds between each check of all the statics.
  --AllGroups = SET_GROUP:New():FilterCategories("ground"):FilterPrefixes({"RSAM","RRSUP","REWR","BSAM","BEWR",}):FilterActive(true):FilterStart()
@@ -109,17 +117,71 @@ end
 
 --SCRIPT START
 env.info("Loaded RIB SAVE, version " .. version)
-if PersistedStore.resetall == 0 then
+if resetall == 0 then
   if file_exists(savefile) then --Script has been run before, so we need to load the save
     dofile(savefile)
-    ctld.completeAASystems = ctldsave[1]
-    ctld.droppedTroopsRed = ctldsave[2]
-    ctld.droppedTroopsBLUE = ctldsave[3]
-    ctld.droppedVehiclesRED = ctldsave[4]
-    ctld.droppedVehiclesBLUE = ctldsave[5]
-    ctld.jtacUnits = ctldsave[6]
-    --ctld.builtFOBS = ctldsave[7]
-    --ctld.logisticUnits = ctldsave[8]
+	if ctldsave[1] ~= nil then
+		ctld.completeAASystems = ctldsave[1]
+	else
+		ctld.completeAASystems = {}
+	end
+    if ctldsave[2] ~= nil then
+		ctld.droppedTroopsRED = ctldsave[2]
+	else
+		ctld.droppedTroopsRED = {}
+	end
+	if ctldsave[3] ~= nil then
+		ctld.droppedTroopsBLUE = ctldsave[3]
+	else
+		ctld.droppedTroopsBLUE = {}
+	end
+    if ctldsave[4] ~= nil then
+		ctld.droppedVehiclesRED = ctldsave[4]
+	else
+		ctld.droppedVehiclesRED = {}
+	end
+	if ctldsave[5] ~= nil then
+		ctld.droppedVehiclesBLUE = ctldsave[5]
+	else
+		ctld.droppedVehiclesBLUE = {}
+	end
+    if ctldsave[6] ~= nil then
+		ctld.jtacUnits = ctldsave[6]
+		local _jtacGroupName = nil
+		local _jtacUnit = nil
+		for _jtacGroupName, _jtacDetails in pairs(ctld.jtacUnits) do
+			print("_jtacGroupName is:" .. _jtacGroupName .. "Units we don't care about")
+			local _code = table.remove(ctld.jtacGeneratedLaserCodes, 1)
+            --put to the end
+            table.insert(ctld.jtacGeneratedLaserCodes, _code)
+            ctld.JTACAutoLase(_jtacGroupName, _code) --(_jtacGroupName, 
+		end
+		
+		
+	else
+		ctld.jtacUnits = {}
+	end
+    if ctldsave[7] ~= nil then
+		ctld.builtFOBS = ctldsave[7]
+	else
+		ctld.builtFOBS = {}
+	end
+	if ctldsave[8] ~= nil then
+		ctld.logisticUnits = ctldsave[8]
+	else
+		BASE:E({"WARNING CTLD SAVE TABLE 8 WAS EMPTY!!!! GENERATING FROM DEFAULT VALUES"})
+		--ctld.logisticUnits = defaultlogisticUnits
+    end
+	if ctldsave[9] ~= nil then
+		ctld.extractableGroups = ctldsave[9]
+	else
+		ctld.extractableGroups = {}
+	end
+
+	--ctld.jtacGeneratedLaserCodes = ctldsave[10]
+	--ctld.jtacLaserPointCodes = ctldsave[11]
+	--ctld.nextUnitId = ctldsave[12]
+	--ctld.nextGroupId = ctldsave[13]
     env.info("Main Mission: Existing database, loading from File.")
     BASE:E({ctldsave})
     ctldper = true
@@ -127,28 +189,9 @@ if PersistedStore.resetall == 0 then
     env.info("Main Mission: We couldn't find an existing Database to load from file")
   end
 else
-  if PersistedStore.resetall == 1 then
+  if resetall == 1 then
     env.info("Main Mission: PersistedStore.resetall was 1")
     ctldper = false
   end
 end
 
-
-function savectldpersistence()
-   BASE:E("saving ctld items")
-   ctldsave = { ctld.completeAASystems, ctld.droppedTroopsRED, ctld.droppedTroopsBLUE, ctld.droppedVehiclesRED,ctld.droppedVehiclesBLUE, ctld.jtacUnits, ctld.builtFOBS, ctld.logisticUnits}
-end
-
-
---THE SAVING SCHEDULE
-SCHEDULER:New( nil, function()
-if init == true then
-  savectldpersistence()
-  newMissionStr = IntegratedserializeWithCycles("ctldsave",ctldsave) --save the Table as a serialised type with key SaveUnits
-  writemission(newMissionStr, savefile)--write the file from the above to SaveUnits.lua
-  env.info("Data saved.")
-  ctldsave = {} -- clean out the table for next time.
-else
-  env.info("init was not true not saving")
-end
-end, {}, 1, SaveSchedulePersistence)
